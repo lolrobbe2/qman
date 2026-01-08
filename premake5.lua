@@ -17,7 +17,7 @@ architecture "x64"
 
    project "qman-lib"
       kind "SharedLib" -- CLI application
-      dotnetframework "net9.0" -- Targeting .NET 9.0
+      dotnetframework "net10.0" -- Targeting .NET 9.0
       location "qman-lib"
       language "C#"
       targetdir "bin/%{cfg.buildcfg}"
@@ -41,7 +41,7 @@ architecture "x64"
 
    project "qman-cli"
       kind "ConsoleApp" -- CLI application
-      dotnetframework "net9.0" -- Targeting .NET 9.0
+      dotnetframework "net10.0" -- Targeting .NET 9.0
       location "qman-cli"
       language "C#"
       targetdir "bin/%{cfg.buildcfg}"
@@ -66,18 +66,18 @@ architecture "x64"
    
    project "qman"
       kind "ConsoleApp" -- CLI application
-      dotnetframework "net9.0" -- Targeting .NET 9.0
+      dotnetframework "net10.0" -- Targeting .NET 9.0
       location "qman"
       language "C#"
       targetdir "bin/%{cfg.buildcfg}"
       files { "%{prj.name}/src/**.cs" } -- Include all C# source files
-      nuget { "Avalonia:11.3.10" }
+      nuget { "Alternet.UI:0.9.802-beta" }
       vsprops {
          PublishSingleFile = "true",
          SelfContained = "true",
          IncludeNativeLibrariesForSelfExtract = "true",
          PublishTrimmed =  "true",
-         Nullable = "enable"
+         Nullable = "enable",
       }
       links {"qman-lib"}
 
