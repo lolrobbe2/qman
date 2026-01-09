@@ -14,11 +14,13 @@ namespace qman.src.Windows
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = this;
+            this.Menu = mainMenu;
         }
 
-        public void HelloButton_Click(object? sender, EventArgs e)
+        private void OpenMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Hello, world!");
+            MessageBox.Show("Hello!");
         }
     }
 }

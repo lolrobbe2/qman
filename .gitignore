@@ -2,3 +2,7 @@
 .vs/
 bin/    
 obj/
+*.csproj
+*.user
+*.tmp
+*.sln
