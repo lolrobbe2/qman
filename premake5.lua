@@ -15,6 +15,29 @@ architecture "x64"
    configurations { "Debug", "Release" }
    startproject "qman"
 
+   project "mdbreader"
+      kind "SharedLib" -- CLI application
+      dotnetframework "net10.0" -- Targeting .NET 9.0
+      location "mdbreader"
+      language "C#"
+      targetdir "bin/%{cfg.buildcfg}"
+      files { "%{prj.name}/src/MdbReader/**.cs" } -- Include all C# source files
+      vsprops {
+         PublishSingleFile = "true",
+         SelfContained = "true",
+         IncludeNativeLibrariesForSelfExtract = "true",
+         PublishTrimmed =  "true",
+         Nullable = "enable"
+      }
+      filter "configurations:Debug"
+         defines { "DEBUG" }
+         optimize "Off"
+      
+      filter "configurations:Release"
+         symbols "Off"
+         defines { "NDEBUG" }
+         optimize "On"
+
    project "qman-lib"
       kind "SharedLib" -- CLI application
       dotnetframework "net10.0" -- Targeting .NET 9.0
@@ -30,6 +53,8 @@ architecture "x64"
          PublishTrimmed =  "true",
          Nullable = "enable"
       }
+      links {"mdbreader"}
+
       filter "configurations:Debug"
          defines { "DEBUG" }
          optimize "Off"
