@@ -5,6 +5,9 @@
 // Copyright Micah Makaiwi.
 // Based on code from libmdb (https://github.com/mdbtools/mdbtools)
 
+using System.Collections.Generic;
+using System.Linq;
+
 namespace MMKiwi.MdbReader.Schema;
 
 /// <summary>

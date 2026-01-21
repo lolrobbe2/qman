@@ -5,6 +5,7 @@
 // Copyright Micah Makaiwi.
 // Based on code from libmdb (https://github.com/mdbtools/mdbtools)
 
+using System;
 using System.Diagnostics;
 using MMKiwi.MdbReader.Schema;
 
@@ -25,7 +26,7 @@ namespace MMKiwi.MdbReader.Values;
 [DebuggerDisplay("{Column.Name}: {Value}")]
 internal sealed class MdbGuidValue : MdbValue<Guid>, IValueAllowableType
 {
-    internal MdbGuidValue(MdbColumn column, bool isNull, ImmutableArray<byte> binaryValue)
+    internal MdbGuidValue(MdbColumn column, bool isNull, ReadOnlySpan<byte> binaryValue)
         : base(column, isNull, binaryValue, 16, 16, AllowableType) { }
     /// <summary>
     /// The <see cref="MdbColumnType" /> that can be used for this value.

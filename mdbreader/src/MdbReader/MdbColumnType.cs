@@ -5,14 +5,12 @@
 // Copyright Micah Makaiwi.
 // Based on code from libmdb (https://github.com/mdbtools/mdbtools)
 
-using NetEscapades.EnumGenerators;
 
 namespace MMKiwi.MdbReader;
 
 /// <summary>
 /// The type of a column in an Access database
 /// </summary>
-[EnumExtensions]
 public enum MdbColumnType : byte
 {
     /// <summary>
@@ -141,7 +139,6 @@ public enum MdbColumnType : byte
 /// See <a href="https://github.com/mdbtools/mdbtools/blob/dev/HACKING.md#data-pages">https://github.com/mdbtools/mdbtools/blob/dev/HACKING.md#data-pages</a>
 /// for more information on the page formats.
 /// </remarks>
-[EnumExtensions]
 internal enum MdbPageType : byte
 {
     DatabaseDefinition = 0x00,
@@ -155,8 +152,6 @@ internal enum MdbPageType : byte
 /// <summary>
 /// Flags that can be set on a given column
 /// </summary>
-[Flags]
-[EnumExtensions]
 public enum MdbColumnFlags : byte
 {
     /// <summary>
@@ -197,8 +192,7 @@ public enum MdbColumnFlags : byte
 /// See <a href="https://github.com/mdbtools/mdbtools/blob/dev/HACKING.md#lval-long-value-pages">https://github.com/mdbtools/mdbtools/blob/dev/HACKING.md#lval-long-value-pages</a>
 /// For more information
 /// </remarks>
-[Flags]
-[EnumExtensions]
+
 internal enum MdbLvalType : byte
 {
     /// <summary>The value is inline in the table (generally short values)</summary>
@@ -212,7 +206,7 @@ internal enum MdbLvalType : byte
 /// <summary>
 /// The version of the Jet database
 /// </summary>
-[EnumExtensions]
+
 public enum JetVersion : byte
 {
     /// <summary>

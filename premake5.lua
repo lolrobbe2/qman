@@ -96,7 +96,7 @@ architecture "x64"
       language "C#"
       targetdir "bin/%{cfg.buildcfg}"
       files { "%{prj.name}/src/**.cs" } -- Include all C# source files
-      nuget { "Alternet.UI:0.9.802-beta" }
+      nuget { "Avalonia:11.3.11","Avalonia.Desktop:11.3.11","Avalonia.Themes.Simple:11.3.11" }
       vsprops {
          PublishSingleFile = "true",
          SelfContained = "true",

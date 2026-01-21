@@ -5,6 +5,7 @@
 // Copyright Micah Makaiwi.
 // Based on code from libmdb (https://github.com/mdbtools/mdbtools)
 
+using System;
 using System.Diagnostics;
 using MMKiwi.MdbReader.Schema;
 
@@ -24,7 +25,7 @@ namespace MMKiwi.MdbReader.Values;
 [DebuggerDisplay("{Column.Name}: {Value}")]
 internal sealed class MdbCurrencyValue : MdbValue<decimal>, IValueAllowableType
 {
-    internal MdbCurrencyValue(MdbColumn column, bool isNull, ImmutableArray<byte> binaryValue)
+    internal MdbCurrencyValue(MdbColumn column, bool isNull, ReadOnlySpan<byte> binaryValue)
         : base(column, isNull, binaryValue, 8, 8, AllowableType) { }
 
     /// <summary>

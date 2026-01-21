@@ -5,7 +5,10 @@
 // Copyright Micah Makaiwi.
 // Based on code from libmdb (https://github.com/mdbtools/mdbtools)
 
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 using MMKiwi.MdbReader.Schema;
 
@@ -17,7 +20,7 @@ namespace MMKiwi.MdbReader;
 [DebuggerDisplay("MdbTable {Name}")]
 public sealed record class MdbTable
 {
-    private MdbTable(string name, int numRows, int nextAutoNum, MdbTableType tableType, ushort maxCols, ushort numVarCols, ushort numColumns, int numIndexes, int numRealIndexes, int usedPagesPtr, int freePagesPtr, int firstPage, ImmutableArray<MdbColumn> columns, Jet3Reader reader, ImmutableArray<MdbIndex> indexes, ImmutableArray<MdbRealIndex> realIndices)
+    private MdbTable(string name, int numRows, int nextAutoNum, MdbTableType tableType, ushort maxCols, ushort numVarCols, ushort numColumns, int numIndexes, int numRealIndexes, int usedPagesPtr, int freePagesPtr, int firstPage, ReadOnlySpan<MdbColumn> columns, Jet3Reader reader, ReadOnlySpan<MdbIndex> indexes, ReadOnlySpan<MdbRealIndex> realIndices)
     {
         Name = name;
         NumRows = numRows;
@@ -31,17 +34,17 @@ public sealed record class MdbTable
         UsedPagesPtr = usedPagesPtr;
         FreePagesPtr = freePagesPtr;
         FirstPage = firstPage;
-        Columns = columns;
-        Indexes = indexes;
+        Columns = columns.ToArray();
+        Indexes = indexes.ToArray();
         Rows = new MdbRows(reader, this);
-        RealIndices = realIndices;
+        RealIndices = realIndices.ToArray();
     }
 
     /// <summary>
     /// An enumerator for all the rows in the database.
     /// </summary>
     public MdbRows Rows { get; }
-    internal ImmutableArray<MdbRealIndex> RealIndices { get; }
+    internal IList<MdbRealIndex> RealIndices { get; }
 
     /// <summary>
     /// The name of the table
@@ -108,12 +111,12 @@ public sealed record class MdbTable
     /// <summary>
     /// The columns in the table
     /// </summary>
-    public ImmutableArray<MdbColumn> Columns { get; }
+    public MdbColumn[] Columns { get; }
 
     /// <summary>
     /// The indexes on the table
     /// </summary>
-    public ImmutableArray<MdbIndex> Indexes { get; }
+    public MdbIndex[] Indexes { get; }
 
     internal class Builder
     {
@@ -162,10 +165,10 @@ public sealed record class MdbTable
                 usedPagesPtr: UsedPagesPtr,
                 freePagesPtr: FreePagesPtr,
                 firstPage: FirstPage,
-                columns: Columns.Select(c => c.Build(reader)).OrderBy(c => c.IndexIncludingDeleted).ToImmutableArray(),
-                indexes: Indices.Select(i => i.Build()).ToImmutableArray(),
+                columns: Columns.Select(c => c.Build(reader)).OrderBy(c => c.IndexIncludingDeleted).ToArray().AsSpan(),
+                indexes: Indices.Select(i => i.Build()).ToArray().AsSpan(),
                 reader: reader,
-                realIndices: RealIndices.Select(i => i.Build()).ToImmutableArray());
+                realIndices: RealIndices.Select(i => i.Build()).ToArray().AsSpan());
         }
     }
 }

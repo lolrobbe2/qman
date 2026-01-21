@@ -5,6 +5,7 @@
 // Copyright Micah Makaiwi.
 // Based on code from libmdb (https://github.com/mdbtools/mdbtools)
 
+using System;
 using System.Diagnostics;
 using MMKiwi.MdbReader.Schema;
 
@@ -26,9 +27,9 @@ namespace MMKiwi.MdbReader.Values;
 /// </para>
 /// </remarks>
 [DebuggerDisplay("{Column.Name}: {Value}")]
-internal sealed class MdbBinaryValue : MdbValue<ImmutableArray<byte>>, IValueAllowableType
+internal sealed class MdbBinaryValue : MdbValue<ReadOnlyMemory<byte>>, IValueAllowableType
 {
-    internal MdbBinaryValue(MdbColumn column, bool isNull, ImmutableArray<byte> binaryValue)
+    internal MdbBinaryValue(MdbColumn column, bool isNull, ReadOnlySpan<byte> binaryValue)
         : base(column, isNull, binaryValue, 0, column.Length, AllowableType) { }
 
     /// <summary>
@@ -45,5 +46,5 @@ internal sealed class MdbBinaryValue : MdbValue<ImmutableArray<byte>>, IValueAll
     /// Note that if <see cref="MdbColumnFlags.FixedLength" /> is set for <see cref="MdbColumn.Flags" />, 
     /// there may be null bytes appended to the end in order to reach the fixed length.
     /// </remarks>
-    public override ImmutableArray<byte> Value => BinaryValue;
+    public override ReadOnlyMemory<byte> Value => BinaryValue;
 }

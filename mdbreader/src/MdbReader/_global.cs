@@ -10,6 +10,8 @@ global using System.Diagnostics;
 global using System.Text;
 global using BitArray = System.Collections.BitArray;
 global using DebuggerDisplayAttribute  = System.Diagnostics.DebuggerDisplayAttribute ;
+
+using System;
 using System.Runtime.CompilerServices;
 
 [assembly: CLSCompliant(true)]

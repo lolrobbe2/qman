@@ -5,10 +5,11 @@
 // Copyright Micah Makaiwi.
 // Based on code from libmdb (https://github.com/mdbtools/mdbtools)
 
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-
-using MMKiwi.Collections;
+using System.Linq;
 
 namespace MMKiwi.MdbReader;
 
@@ -19,13 +20,13 @@ public class MdbTables : IReadOnlyList<MdbTable>
 {
     private TableCollection Tables { get; }
 
-    internal MdbTables(ImmutableArray<MdbTable> tables, IEqualityComparer<string> comparer)
+    internal MdbTables(ReadOnlySpan<MdbTable> tables, IEqualityComparer<string> comparer)
     {
         Tables = new(tables, comparer);
     }
 
     /// <inheritdoc/>
-    public MdbTable this[int index] => Tables[index];
+    public MdbTable this[int index] => Tables.Values.ElementAt(index);
 
     /// <inheritdoc/>
     public MdbTable this[string key] => Tables[key];
@@ -34,15 +35,15 @@ public class MdbTables : IReadOnlyList<MdbTable>
     public int Count => Tables.Count;
 
     /// <inheritdoc/>
-    public IEnumerable<string> Keys => Tables.Select(t => t.Name);
+    public IEnumerable<string> Keys => Tables.Keys;
 
     /// <inheritdoc/>
-    public IEnumerable<MdbTable> Values => Tables;
+    public IEnumerable<MdbTable> Values => Tables.Values;
 
     /// <inheritdoc/>
-    public bool ContainsKey(string key) => Tables.Contains(key);
+    public bool ContainsKey(string key) => Tables.ContainsKey(key);
     /// <inheritdoc/>
-    public IEnumerator<MdbTable> GetEnumerator() => Tables.GetEnumerator();
+    public IEnumerator<MdbTable> GetEnumerator() => Tables.Values.GetEnumerator();
 
     /// <summary>
     /// Tries to get a specific table from the database.
@@ -73,13 +74,22 @@ public class MdbTables : IReadOnlyList<MdbTable>
     /// <inheritdoc/>
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    private class TableCollection : ImmutableKeyedCollection<string, MdbTable>
+    private class TableCollection : Dictionary<string, MdbTable>
     {
 
-        public TableCollection(ImmutableArray<MdbTable> baseCollection, IEqualityComparer<string>? comparer = null, int dictionaryCreationThreshold = 0) : base(baseCollection, comparer, dictionaryCreationThreshold)
+        public TableCollection(ReadOnlySpan<MdbTable> baseCollection, IEqualityComparer<string>? comparer = null, int dictionaryCreationThreshold = 0) : base(comparer)
         {
+            if (dictionaryCreationThreshold > 0)
+                EnsureCapacity(dictionaryCreationThreshold);
+            
+
+            // Populate the dictionary from the ReadOnlySpan
+            for (int i = 0; i < baseCollection.Length; i++)
+            {
+                MdbTable table = baseCollection[i];
+                this[table.Name] = table; // assuming MdbTable has a Name property
+            }
         }
 
-        protected override string GetKeyForItem(MdbTable item) => item.Name;
     }
 }

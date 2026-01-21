@@ -5,6 +5,8 @@
 // Copyright Micah Makaiwi.
 // Based on code from libmdb (https://github.com/mdbtools/mdbtools)
 
+using System;
+
 namespace MMKiwi.MdbReader;
 internal class JetConstants
 {
@@ -37,7 +39,7 @@ internal class JetConstants
 
     public static ushort OffsetMask => 0x1fff;
 
-    public static ReadOnlySpan<byte> LvalString => "LVAL"u8;
+    public static byte[] LvalString => "LVAL"u8.ToArray();
 
     internal record class DataPageConstants
     {
@@ -65,7 +67,7 @@ internal class JetConstants
         JetVersion JetVersion { get; }
 
         public const uint DbMagicNumber = 0x100;
-        public ReadOnlySpan<byte> DbFileFormatId => JetVersion is JetVersion.Jet3 or JetVersion.Jet4 ? "Standard Jet DB"u8 : "Standard ACE DB"u8;
+        public byte[] DbFileFormatId => (JetVersion is JetVersion.Jet3 or JetVersion.Jet4 ? "Standard Jet DB"u8 : "Standard ACE DB"u8).ToArray();
 
         public int DbHeaderSize => JetVersion is JetVersion.Jet3 ? 126 : 128;
         public int DbCollationOffset => JetVersion is JetVersion.Jet3 ? 0x22 : 0x56;

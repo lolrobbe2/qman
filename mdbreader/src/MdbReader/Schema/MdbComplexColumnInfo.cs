@@ -5,6 +5,8 @@
 // Copyright Micah Makaiwi.
 // Based on code from libmdb (https://github.com/mdbtools/mdbtools)
 
+using System.Collections.Generic;
+
 namespace MMKiwi.MdbReader.Schema;
 
 internal record class MdbComplexColumnInfo : MdbMiscColumnInfo

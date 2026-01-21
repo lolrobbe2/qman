@@ -5,7 +5,10 @@
 // Copyright Micah Makaiwi.
 // Based on code from libmdb (https://github.com/mdbtools/mdbtools)
 
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace MMKiwi.MdbReader;
 
@@ -31,7 +34,7 @@ public class MdbRows : IEnumerable<MdbDataRow>, IAsyncEnumerable<MdbDataRow>
         foreach (int page in Reader.GetUsageMap(usageMap))
         {
             await foreach (var row in Reader.ReadDataPageAsync(page, Table, new HashSet<string>(0), ct))
-                yield return new(row, Reader.Options.TableNameComparison, 10);
+                yield return new(row.ToArray().AsSpan(), Reader.Options.TableNameComparison, 10);
         }
     }
 
@@ -43,7 +46,7 @@ public class MdbRows : IEnumerable<MdbDataRow>, IAsyncEnumerable<MdbDataRow>
         foreach (int page in Reader.GetUsageMap(usageMap))
         {
             foreach (var row in Reader.ReadDataPage(page, Table, new HashSet<string>(0)))
-                yield return new(row, Reader.Options.TableNameComparison, 10);
+                yield return new(row.ToArray().AsSpan(), Reader.Options.TableNameComparison, 10);
         }
     }
 

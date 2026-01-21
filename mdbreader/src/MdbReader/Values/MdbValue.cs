@@ -5,6 +5,7 @@
 // Copyright Micah Makaiwi.
 // Based on code from libmdb (https://github.com/mdbtools/mdbtools)
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using MMKiwi.MdbReader.Schema;
 
@@ -108,7 +109,7 @@ namespace MMKiwi.MdbReader.Values;
 /// <item>
 /// <term><see cref="MdbBinaryValue" /></term>
 /// <term><see cref="MdbColumnType.Binary" /></term>
-/// <term><see cref="ImmutableArray{T}" /> of <see cref="byte" /></term>
+/// <term><see cref="ReadOnlySpan{T}" /> of <see cref="byte" /></term>
 /// <term>Yes</term>
 /// <term>N/A</term>
 /// <term><c>BINARY</c> and <c>VARBINARY</c></term>
@@ -151,7 +152,7 @@ internal abstract class MdbValue<TVal> : IMdbValue<TVal>
     /// </param>
     /// <exception cref="ArgumentNullException">
     ///   Thrown if column or binaryValue is null. (If a zero-length binaryValue is needed, pass 
-    ///   <see cref="ImmutableArray{T}.Empty" />
+    ///   <see cref="ReadOnlySpan{T}.Empty" />
     /// </exception>
     /// <exception cref="ArgumentException">
     /// <para>
@@ -163,7 +164,7 @@ internal abstract class MdbValue<TVal> : IMdbValue<TVal>
     /// <item><description>isNull is true but allowNull is false</description></item>
     /// </list>
     /// </exception>
-    private protected MdbValue(MdbColumn column, bool isNull, ImmutableArray<byte> binaryValue, int minLength, int maxLength, MdbColumnType allowableType)
+    private protected MdbValue(MdbColumn column, bool isNull, ReadOnlySpan<byte> binaryValue, int minLength, int maxLength, MdbColumnType allowableType)
     {
         if (column is null)
             throw new ArgumentNullException(nameof(column));
@@ -175,7 +176,7 @@ internal abstract class MdbValue<TVal> : IMdbValue<TVal>
 
         Column = column;
         IsNull = isNull;
-        BinaryValue = isNull ? ImmutableArray<byte>.Empty : binaryValue;
+        BinaryValue = (isNull ? ReadOnlySpan<byte>.Empty : binaryValue).ToArray();
     }
 
     /// <summary>
@@ -189,7 +190,7 @@ internal abstract class MdbValue<TVal> : IMdbValue<TVal>
     [MemberNotNullWhen(false, nameof(Value))]
     public bool IsNull { get; }
 
-    private protected ImmutableArray<byte> BinaryValue { get; }
+    private protected byte[] BinaryValue { get; }
 
     /// <summary>
     /// The value for the specific row and column, converted from the raw 

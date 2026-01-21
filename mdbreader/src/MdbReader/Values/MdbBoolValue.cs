@@ -5,6 +5,7 @@
 // Copyright Micah Makaiwi.
 // Based on code from libmdb (https://github.com/mdbtools/mdbtools)
 
+using System;
 using System.Diagnostics;
 using MMKiwi.MdbReader.Schema;
 
@@ -23,7 +24,7 @@ namespace MMKiwi.MdbReader.Values;
 internal sealed class MdbBoolValue : MdbValue<bool>, IValueAllowableType
 {
     internal MdbBoolValue(MdbColumn column, bool isNull)
-     : base(column, false, ImmutableArray<byte>.Empty, 0, 0, AllowableType)
+     : base(column, false, ReadOnlySpan<byte>.Empty, 0, 0, AllowableType)
     {
         Value = !isNull;
     }

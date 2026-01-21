@@ -5,6 +5,7 @@
 // Copyright Micah Makaiwi.
 // Based on code from libmdb (https://github.com/mdbtools/mdbtools)
 
+using System;
 using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 #if !NET5_0_OR_GREATER

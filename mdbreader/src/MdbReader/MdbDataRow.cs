@@ -5,6 +5,10 @@
 // Copyright Micah Makaiwi.
 // Based on code from libmdb (https://github.com/mdbtools/mdbtools)
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 using MMKiwi.MdbReader.Values;
 
 namespace MMKiwi.MdbReader;
@@ -15,13 +19,13 @@ namespace MMKiwi.MdbReader;
 /// </summary>
 public sealed partial class MdbDataRow
 {
-    internal MdbDataRow(ImmutableArray<IMdbValue> baseCollection, IEqualityComparer<string>? comparer, int dictionaryCreationThreshold)
+    internal MdbDataRow(ReadOnlySpan<IMdbValue> baseCollection, IEqualityComparer<string>? comparer, int dictionaryCreationThreshold)
     {
         Fields = new(baseCollection, comparer, dictionaryCreationThreshold);
     }
 
     FieldCollection Fields { get; }
-    internal IEnumerable<IMdbValue> FieldValues => Fields.AsEnumerable();
+    internal IEnumerable<IMdbValue> FieldValues => Fields.Values;
 
     /// <summary>
     /// The number of columns in the current row. 
@@ -33,7 +37,7 @@ public sealed partial class MdbDataRow
     /// </summary>
     /// <param name="index">The zero-based column ordinal.</param>
     /// <throws cref="IndexOutOfRangeException">The index passed was outside of the range of 0 through <see cref="FieldCount" />.</throws>
-    public object? this[int index] => Fields[index].Value;
+    public object? this[int index] => Fields.ElementAt(index).Value;
 
     /// <summary>
     /// Gets the value of the specified column in its native format given the column name.
@@ -139,7 +143,7 @@ public sealed partial class MdbDataRow
     /// Returns a list of all the columns in the specified row.
     /// </summary>    
     /// <returns>The <see cref="MdbColumn" /> objects for all fields in the row.</returns>
-    public IEnumerable<MdbColumn> Columns => Fields.Select(f => f.Column);
+    public IEnumerable<MdbColumn> Columns => Fields.Select(f => f.Value.Column);
 
 #warning TODO: Document what types are associated with each column
     /// <summary>

@@ -5,6 +5,9 @@
 // Copyright Micah Makaiwi.
 // Based on code from libmdb (https://github.com/mdbtools/mdbtools)
 
+using System;
+using System.Threading.Tasks;
+
 using MMKiwi.MdbReader.Values;
 
 namespace MMKiwi.MdbReader;

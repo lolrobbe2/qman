@@ -5,6 +5,8 @@
 // Copyright Micah Makaiwi.
 // Based on code from libmdb (https://github.com/mdbtools/mdbtools)
 
+using System;
+
 namespace MMKiwi.MdbReader.Values;
 
 internal static class MdbValueFactory
@@ -20,7 +22,7 @@ internal static class MdbValueFactory
     /// <param name="isNull"></param>
     /// <param name="binaryValue"></param>
     /// <returns></returns>
-    public static IMdbValue CreateValue(Jet3Reader reader, MdbColumn column, bool isNull, ImmutableArray<byte> binaryValue)
+    public static IMdbValue CreateValue(Jet3Reader reader, MdbColumn column, bool isNull, ReadOnlySpan<byte> binaryValue)
     {
         return (column.Type) switch
         {

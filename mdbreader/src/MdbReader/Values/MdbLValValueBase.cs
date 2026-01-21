@@ -5,6 +5,8 @@
 // Copyright Micah Makaiwi.
 // Based on code from libmdb (https://github.com/mdbtools/mdbtools)
 
+using System;
+
 namespace MMKiwi.MdbReader.Values;
 
 /// <summary>
@@ -16,7 +18,7 @@ namespace MMKiwi.MdbReader.Values;
 /// </typeparam>
 internal abstract class MdbLongValField<TOut> : MdbValue<TOut>
 {
-    private protected MdbLongValField(Jet3Reader reader, MdbColumn column, bool isNull, ImmutableArray<byte> binaryValue, MdbColumnType allowableType)
+    private protected MdbLongValField(Jet3Reader reader, MdbColumn column, bool isNull, ReadOnlySpan<byte> binaryValue, MdbColumnType allowableType)
         : base(column, isNull, binaryValue, 0, int.MaxValue, allowableType)
     {
         Reader = reader;

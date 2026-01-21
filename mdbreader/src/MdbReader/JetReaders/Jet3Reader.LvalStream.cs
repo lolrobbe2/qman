@@ -5,6 +5,8 @@
 // Copyright Micah Makaiwi.
 // Based on code from libmdb (https://github.com/mdbtools/mdbtools)
 
+using System;
+
 using MMKiwi.MdbReader.Helpers;
 
 namespace MMKiwi.MdbReader;
@@ -13,11 +15,11 @@ internal partial class Jet3Reader
 {
     internal class LvalStream
     {
-        internal LvalStream(Jet3Reader reader, MdbColumn column, ImmutableArray<byte> firstDataPointer)
+        internal LvalStream(Jet3Reader reader, MdbColumn column, ReadOnlySpan<byte> firstDataPointer)
         {
             Reader = reader;
             Column = column;
-            FirstDataPointer = firstDataPointer;
+            FirstDataPointer = firstDataPointer.ToArray();
             // if the memo is null, nothing special is needed
             ReadOnlySpan<byte> binRowRegion = FirstDataPointer.AsSpan();
 
@@ -34,7 +36,7 @@ internal partial class Jet3Reader
         }
         internal Jet3Reader Reader { get; }
         public MdbColumn Column { get; }
-        private ImmutableArray<byte> FirstDataPointer { get; }
+        private byte[] FirstDataPointer { get; }
 
         public int Length { get; }
         public MdbLvalType LvalType { get; }

@@ -5,20 +5,24 @@
 // Copyright Micah Makaiwi.
 // Based on code from libmdb (https://github.com/mdbtools/mdbtools)
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace MMKiwi.MdbReader.Schema;
 
 internal class MdbRealIndex
 {
-    private MdbRealIndex(ImmutableArray<MdbRealIndexColumn> columns, int usedPages, int firstDataPointer, int flags, int numIndexRows)
+    private MdbRealIndex(ReadOnlySpan<MdbRealIndexColumn> columns, int usedPages, int firstDataPointer, int flags, int numIndexRows)
     {
-        Columns = columns;
+        Columns = columns.ToArray();
         UsedPages = usedPages;
         FirstDataPointer = firstDataPointer;
         Flags = flags;
         NumIndexRows = numIndexRows;
     }
 
-    public ImmutableArray<MdbRealIndexColumn> Columns { get; }
+    public IList<MdbRealIndexColumn> Columns { get; }
     public int UsedPages { get; }
     public int FirstDataPointer { get; }
     public int Flags { get; }
@@ -34,7 +38,7 @@ internal class MdbRealIndex
 
         public MdbRealIndex Build()
             => new MdbRealIndex(
-                columns: Columns.Where(i => i.ColNum > 0).Select(i => i.Build()).ToImmutableArray(),
+                columns: Columns.Where(i => i.ColNum > 0).Select(i => i.Build()).ToArray().AsSpan(),
                 usedPages: UsedPages,
                 flags: Flags,
                 firstDataPointer: FirstDataPointer,

@@ -5,6 +5,8 @@
 // Copyright Micah Makaiwi.
 // Based on code from libmdb (https://github.com/mdbtools/mdbtools)
 
+using System;
+
 using MMKiwi.MdbReader.Schema;
 
 namespace MMKiwi.MdbReader.Values;
@@ -32,13 +34,13 @@ namespace MMKiwi.MdbReader.Values;
 internal sealed class MdbStringValue : MdbValue<string>, IValueAllowableType
 {
     //Not saving the string to the BinaryValue buffer in order to not duplicate it
-    internal MdbStringValue(MdbColumn column, bool isNull, ImmutableArray<byte> binaryValue)
-        : base(column, isNull, ImmutableArray<byte>.Empty, 0, column.Length, AllowableType)
+    internal MdbStringValue(MdbColumn column, bool isNull, ReadOnlySpan<byte> binaryValue)
+        : base(column, isNull, ReadOnlySpan<byte>.Empty, 0, column.Length, AllowableType)
     {
 
         Encoding = (column.ColumnInfo as MdbTextColumnInfo)!.Encoding;
 
-        Value = ConversionFunctions.AsString(Encoding, binaryValue.AsSpan());
+        Value = ConversionFunctions.AsString(Encoding, binaryValue);
     }
 
     /// <summary>
@@ -80,5 +82,5 @@ internal sealed class MdbStringValue : MdbValue<string>, IValueAllowableType
     /// (for instance to write to disc), use <see cref="RawValue" /> instead.
     /// </para>
     /// </remarks>
-    public ImmutableArray<byte> RawValue => BinaryValue;
+    public ReadOnlySpan<byte> RawValue => BinaryValue;
 }

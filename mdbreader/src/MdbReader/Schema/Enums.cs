@@ -5,7 +5,6 @@
 // Copyright Micah Makaiwi.
 // Based on code from libmdb (https://github.com/mdbtools/mdbtools)
 
-using NetEscapades.EnumGenerators;
 
 namespace MMKiwi.MdbReader.Schema;
 
@@ -45,7 +44,7 @@ internal enum MdbPageType : byte
 /// <summary>
 /// Flags that can be set on a given column
 /// </summary>
-[Flags]
+
 public enum MdbColumnFlags : byte
 {
     /// <summary>
@@ -82,7 +81,7 @@ public enum MdbColumnFlags : byte
 /// <summary>
 /// The type of an index
 /// </summary>
-[EnumExtensions]
+
 public enum MdbIndexType : byte
 {
     /// <summary>
@@ -103,7 +102,7 @@ public enum MdbIndexType : byte
 /// See <a href="https://github.com/mdbtools/mdbtools/blob/dev/HACKING.md#lval-long-value-pages">https://github.com/mdbtools/mdbtools/blob/dev/HACKING.md#lval-long-value-pages</a>
 /// For more information
 /// </remarks>
-[Flags]
+
 internal enum MdbLvalType : byte
 {
     /// <summary>The value is inline in the table (generally short values)</summary>
