@@ -103,6 +103,7 @@ architecture "x64"
          IncludeNativeLibrariesForSelfExtract = "true",
          PublishTrimmed =  "true",
          Nullable = "enable",
+         AllowUnsafe = "true"
       }
       links {"qman-lib"}
 

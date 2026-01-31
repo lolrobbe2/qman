@@ -298,7 +298,7 @@ internal abstract partial class Jet3Reader : IDisposable, IAsyncDisposable
     {
         var c = Db.Constants.TablePage;
         ushort colNum = MdbBinary.ReadUInt16LittleEndian(varColSlice[c.VarColNum]);
-        if (colNum == ushort.MaxValue)
+        if (colNum == ushort.MaxValue || colNum >= columns.Count())
         {
             return false;
         }

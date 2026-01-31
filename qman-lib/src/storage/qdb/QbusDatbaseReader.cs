@@ -7,10 +7,9 @@ namespace qmanlib.src.storage.qdb
 {
     public class QbusDatbaseReader
     {
-        public static void Open(string filePath)
+        public static QbusDatabase Open(string filePath)
         {
-            MdbConnection handle = MdbConnection.Open(filePath);
-            var tables = handle.Tables;
+            return new QbusDatabase(MdbConnection.Open(filePath));
         }
     }
 }

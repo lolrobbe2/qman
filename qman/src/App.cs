@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
+using qman.src.controllers;
 using qman.src.Windows;
 using qman.src.Windows.main;
 using System.IO;
@@ -13,7 +14,15 @@ public class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow();
+            MainWindow window = new MainWindow();
+
+            #region Controllers
+            window.AddController<MainMenu>("main_menu");
+            window.AddController<ModulesController>("modules_controller");
+            #endregion
+            window.Build();
+            desktop.MainWindow = window;
+            
         }
 
         base.OnFrameworkInitializationCompleted();

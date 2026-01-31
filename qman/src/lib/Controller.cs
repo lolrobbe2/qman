@@ -1,70 +1,71 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Interactivity;
-using Avalonia.Themes;
-using Avalonia.Themes.Simple;
-using qman.src.lib;
+﻿using Avalonia.Controls;
+using qman.src.Windows.main;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
-namespace qman.src.Windows.main
+namespace qman.src.lib
 {
-    internal class MainWindow : Window
-    {
-        private readonly Dictionary<string, Control> ControllerControls = new();
-        private Dictionary<string,Controller> Controllers { get; init; }
-        public MainWindow()
-        {
-            this.Styles.Add(new SimpleTheme());
-            // Set the window title
-            this.Title = "QMan";
+    public delegate void UpdateControllersHandler(string name);
 
-            // Optional: start maximized / full screen
-            this.WindowState = WindowState.Maximized;
-            this.Controllers = new Dictionary<string, Controller>();
-            // Optional: remove decorations for true fullscreen
-            // this.SystemDecorations = SystemDecorations.None;
-            // this.CanResize = false;
-            // Set empty content
-            this.Content = GetContent();
-            
-        }
-        public MainWindow AddController<TController>(string name)
-            where TController: Controller, new()
+    public abstract class Controller
+    {
+        public TopLevel? topLevel { get; set; }
+        public string? Name { get; set; }
+        public UpdateControllersHandler? RequestUpdate { get; set; }
+        public abstract Control? GetContent(ref DockPanel panel);
+        public virtual void UpdateContent()
         {
-            Controllers.Add(name, new TController() { topLevel = GetTopLevel(this), Name = name, RequestUpdate = UpdateController});
+            if (RequestUpdate != null)
+            {
+                RequestUpdate.Invoke(Name ?? "");
+            }
+        }
+        public virtual void UpdateAllContent()
+        {
+            if (RequestUpdate != null)
+            {
+                RequestUpdate.Invoke("");
+            }
+        }
+    }
+
+    public abstract class ContainerController : Controller
+    {
+        private DockPanel DockPanel = new();
+        private Dictionary<string, Control> ControllerControls = new();
+        private Dictionary<string, Controller> Controllers = new ();
+        public ContainerController AddController<TController>(string name)
+         where TController : Controller, new()
+        {
+            Controllers.Add(name, new TController() { topLevel = topLevel, Name = name, RequestUpdate = UpdateController });
             return this;
         }
-        public MainWindow AddController<TController>(string name, TController instance)
+        public ContainerController AddController<TController>(string name, TController instance)
            where TController : Controller, new()
         {
-            instance.topLevel = GetTopLevel(this);
+            instance.topLevel = topLevel;
             instance.Name = name;
             instance.RequestUpdate = UpdateController;
             Controllers.Add(name, instance);
             return this;
         }
-        public void Build()
-        {
-            this.Content = GetContent();
-        }
-        private object? GetContent()
+        public override Control? GetContent(ref DockPanel panel)
         {
             ControllerControls.Clear();
-            var dockPanel = new DockPanel();
-
+            DockPanel.Children.Clear();
             foreach (Controller item in Controllers.Values)
             {
-                Control? control = item.GetContent(ref dockPanel);
+                Control? control = item.GetContent(ref DockPanel);
                 if (control != null)
                 {
-                    dockPanel.Children.Add(control);
+                    
+                    DockPanel.Children.Add(control);
                     ControllerControls[item.Name!] = control;
                 }
             }
-            
-            return dockPanel;
+
+            return DockPanel;
         }
         private void UpdateController(string name)
         {
@@ -106,6 +107,7 @@ namespace qman.src.Windows.main
                     ControllerControls.Remove(name);
                 }
             }
+            UpdateContent();
         }
     }
 }
