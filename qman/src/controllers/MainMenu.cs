@@ -47,9 +47,12 @@ namespace qman.src.controllers
                 }
             };
             IReadOnlyList<IStorageFile> files = await topLevel?.StorageProvider.OpenFilePickerAsync(options)!;
-            QbusDatabase db = QbusDatbaseReader.Open(files[0].TryGetLocalPath()!);
-            GlobalState.repositories = new CommonRepostories(db);
-            UpdateAllContent();
+            if (files.Count > 0)
+            {
+                QbusDatabase db = QbusDatbaseReader.Open(files[0].TryGetLocalPath()!);
+                GlobalState.repositories = new CommonRepostories(db);
+                UpdateAllContent();
+            }
         }
 
      

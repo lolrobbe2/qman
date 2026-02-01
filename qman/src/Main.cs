@@ -7,7 +7,6 @@ using System;
 AppBuilder
            .Configure<App>()
            .UsePlatformDetect()
-           .UseSkia()
            .LogToTrace().StartWithClassicDesktopLifetime(args);
 
 Console.WriteLine("hello");

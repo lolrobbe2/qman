@@ -8,6 +8,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading;
 
 namespace MMKiwi.MdbReader;
@@ -52,4 +54,13 @@ public class MdbRows : IEnumerable<MdbDataRow>, IAsyncEnumerable<MdbDataRow>
 
     /// <inheritdoc/>
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    public IEnumerable<T> As<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T>() where T : class, new()
+    {
+        List<T> rows = new List<T>();
+        foreach(MdbDataRow row in this)
+        {
+            rows.Add(row.As<T>());
+        }
+        return rows;
+    }
 }

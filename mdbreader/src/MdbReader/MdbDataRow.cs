@@ -7,7 +7,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
+
+using mdbreader.src.MdbReader.attributes;
 
 using MMKiwi.MdbReader.Values;
 
@@ -23,6 +28,7 @@ public sealed partial class MdbDataRow
     {
         Fields = new(baseCollection, comparer, dictionaryCreationThreshold);
     }
+    private static readonly Regex NameNumberRegex = new Regex(@"^(?<name>[A-Za-z_]+)(?<number>\d+)$", RegexOptions.Compiled);
 
     FieldCollection Fields { get; }
     internal IEnumerable<IMdbValue> FieldValues => Fields.Values;
@@ -171,5 +177,80 @@ public sealed partial class MdbDataRow
         var fieldValue = GetFieldValue(columnName);
         if (fieldValue.IsNull) return null;
         return fieldValue.Value;
+    }
+    public static bool TryExtractNameAndNumber(string input, out string namePart, out int numberPart)
+    {
+        namePart = null;
+        numberPart = 0;
+
+        var match = NameNumberRegex.Match(input);
+        if (!match.Success)
+            return false;
+
+        namePart = match.Groups["name"].Value;
+        numberPart = int.Parse(match.Groups["number"].Value);
+        return true;
+    }
+    public T As<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T>() where T : class, new()
+    {
+        var type = typeof(T);
+        MdbRowAttribute? attr = (MdbRowAttribute?)Attribute.GetCustomAttribute(type, typeof(MdbRowAttribute));
+        if (attr == null)
+        {
+            throw new InvalidOperationException("T must have the MdbRowAttribute");
+        }
+        T instance = new T();
+
+        foreach (MdbColumn col in Columns)
+        {
+            /*
+            object? valueToSet = col.Type switch
+            {
+                MdbColumnType.Boolean => GetBoolean(col.Index),
+                MdbColumnType.Byte => GetByte(col.Index),
+                MdbColumnType.Int => GetString(col.Index),
+                MdbColumnType.LongInt => GetInt32(col.Index),
+                MdbColumnType.Currency => GetNullableDecimal(col.Index),
+                MdbColumnType.Single => GetSingle(col.Index),
+                MdbColumnType.Double => GetDouble(col.Index),
+                MdbColumnType.DateTime => GetDateTime(col.Index),
+                MdbColumnType.Binary => GetString(col.Index),
+                MdbColumnType.Text => GetString(col.Index),
+                MdbColumnType.Memo => GetString(col.Index),
+                MdbColumnType.Numeric => GetDecimal(col.Index),
+                MdbColumnType.Complex => GetInt32(col.Index),
+                _ => null
+            };
+            */
+            object? valueToSet = GetValue(col.Name);
+            if (TryExtractNameAndNumber(col.Name, out string name, out int number))
+            {
+                PropertyInfo? prop = type?.GetProperty(name, BindingFlags.Public | BindingFlags.Instance);
+
+                var arrayInstance = prop.GetValue(instance) as Array;
+
+                if (arrayInstance != null && number < arrayInstance.Length)
+                {
+
+
+                    // 2. Set the value at the specific index
+                    if (valueToSet != null)
+                    {
+                        arrayInstance.SetValue(valueToSet, number);
+                    }
+                }
+            }
+            else
+            {
+                PropertyInfo? prop = type?.GetProperty(col.Name, BindingFlags.Public | BindingFlags.Instance);
+                if (prop == null && type != null)
+                {
+                    prop = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                               .FirstOrDefault(p => p.GetCustomAttribute<MdbParamAttribute>()?.Name == col.Name);
+                }
+                prop!.SetValue(instance, valueToSet);
+            }
+        }
+        return instance;
     }
 }

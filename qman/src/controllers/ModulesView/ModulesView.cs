@@ -114,8 +114,6 @@ namespace qman.src.controllers.ModulesView
                 {
                     if (treeView.SelectedItem is PlaceTreeNode node && topLevel!.Clipboard != null)
                     {
-
-
                         ClipboardService.SetText(node.Title);
                     }
                 }

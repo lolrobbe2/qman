@@ -1,22 +1,18 @@
-﻿using MMKiwi.MdbReader;
+﻿using mdbreader.src.MdbReader.attributes;
+using MMKiwi.MdbReader;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace qmanlib.src.storage.qdb
 {
-   
+    [MdbRow]
     public class QdbController
     {
+        [MdbParam("adres")]        
         
-        byte addres { get; set; }
-        string? mode { get; set; }
-        public QdbController(MdbDataRow row)
-        {
-
-            addres = row.GetByte((int)ParamIndex.ADRES);
-            mode = row.GetString((int)ParamIndex.MODE);
-        }
+        public byte addres { get; set; }
+        public string? mode { get; set; }
 
         private enum ParamIndex : int
         {

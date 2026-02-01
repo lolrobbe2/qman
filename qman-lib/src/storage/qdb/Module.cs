@@ -22,6 +22,7 @@ namespace qmanlib.src.storage.qdb
         OutputExt0 = 56, OutputExt1 = 57, OutputExt2 = 58, OutputExt3 = 59,
         LocationId = 60, CtdId = 61, BusNumber = 62, EepromCrc = 63, FlashCrc = 64
     }
+    
     public class QdbModule : Module
     {
         private static readonly int[] OutputColumnMap = Enumerable.Range(0, 16)

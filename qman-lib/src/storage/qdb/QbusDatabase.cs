@@ -1,6 +1,7 @@
 ﻿using MMKiwi.MdbReader;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace qmanlib.src.storage.qdb
@@ -23,12 +24,8 @@ namespace qmanlib.src.storage.qdb
         {
             MdbTable table = Tables["Controler"];
             MdbRows rows = table.Rows;
-            IList<QdbController> controllers = new List<QdbController>();
-            foreach (var item in rows)
-            {
-                controllers.Add(new QdbController(item));
-            }
-            return Controllers;
+            return rows.As<QdbController>().ToList();
+
         }
         private IList<QdbModule> GetModules()
         {
@@ -45,12 +42,14 @@ namespace qmanlib.src.storage.qdb
         {
             MdbTable table = Tables["Plaatsen"];
             MdbRows rows = table.Rows;
+            /*
             IList<QdbPlace> places = new List<QdbPlace>();
             foreach (var item in rows)
             {
                 places.Add(new QdbPlace(item));
             }
-            return places;
+            */
+            return rows.As<QdbPlace>().ToList();
         }
     }
 }

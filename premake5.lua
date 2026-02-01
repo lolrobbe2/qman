@@ -27,7 +27,9 @@ architecture "x64"
          SelfContained = "true",
          IncludeNativeLibrariesForSelfExtract = "true",
          PublishTrimmed =  "true",
-         Nullable = "enable"
+         Nullable = "enable",
+         AllowUnsafeBlocks = "true",
+
       }
       filter "configurations:Debug"
          defines { "DEBUG" }
@@ -51,7 +53,8 @@ architecture "x64"
          SelfContained = "true",
          IncludeNativeLibrariesForSelfExtract = "true",
          PublishTrimmed =  "true",
-         Nullable = "enable"
+         Nullable = "enable",
+
       }
       links {"mdbreader"}
 
@@ -103,7 +106,6 @@ architecture "x64"
          IncludeNativeLibrariesForSelfExtract = "true",
          PublishTrimmed =  "true",
          Nullable = "enable",
-         AllowUnsafe = "true",
       }
       links {"qman-lib"}
 
