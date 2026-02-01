@@ -28,6 +28,10 @@ namespace qman.src.lib
                 RequestUpdate.Invoke("");
             }
         }
+        public virtual void Init()
+        {
+
+        }
     }
 
     public abstract class ContainerController : Controller
@@ -38,7 +42,10 @@ namespace qman.src.lib
         public ContainerController AddController<TController>(string name)
          where TController : Controller, new()
         {
-            Controllers.Add(name, new TController() { topLevel = topLevel, Name = name, RequestUpdate = UpdateController });
+            var control = new TController() { Name = name, RequestUpdate = UpdateController };
+            control.topLevel = topLevel;
+            control.Init();
+            Controllers.Add(name, control);
             return this;
         }
         public ContainerController AddController<TController>(string name, TController instance)
@@ -47,6 +54,8 @@ namespace qman.src.lib
             instance.topLevel = topLevel;
             instance.Name = name;
             instance.RequestUpdate = UpdateController;
+            instance.Init();
+
             Controllers.Add(name, instance);
             return this;
         }

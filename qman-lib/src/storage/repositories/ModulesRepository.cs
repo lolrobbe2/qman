@@ -28,5 +28,13 @@ namespace qmanlib.src.storage.repositories
         {
             return Modules.Where((module) => module.LocationId == place.ID);
         }
+
+        public void SetModuleParent(Int16 place, string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return;
+            int index = Modules.IndexOf(Modules.First((module) => module.Location == name));
+            Modules[index].LocationId = place;
+        }
     }
 }

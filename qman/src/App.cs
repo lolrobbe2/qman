@@ -5,6 +5,7 @@ using Avalonia.Platform.Storage;
 using qman.src.controllers;
 using qman.src.Windows;
 using qman.src.Windows.main;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 

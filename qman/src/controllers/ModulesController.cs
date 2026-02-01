@@ -10,6 +10,10 @@ namespace qman.src.controllers
     {
         public ModulesController()
         {
+            
+        }
+        public override void Init()
+        {
             AddController<ModulesView.ModulesView>("modules_view");
         }
     }

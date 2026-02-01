@@ -33,8 +33,11 @@ namespace qman.src.Windows.main
         public MainWindow AddController<TController>(string name)
             where TController: Controller, new()
         {
-            Controllers.Add(name, new TController() { topLevel = GetTopLevel(this), Name = name, RequestUpdate = UpdateController});
-            return this;
+
+            var control = new TController() { Name = name, RequestUpdate = UpdateController };
+            control.topLevel = GetTopLevel(this);
+            control.Init();
+            Controllers.Add(name, control); return this;
         }
         public MainWindow AddController<TController>(string name, TController instance)
            where TController : Controller, new()
@@ -42,6 +45,7 @@ namespace qman.src.Windows.main
             instance.topLevel = GetTopLevel(this);
             instance.Name = name;
             instance.RequestUpdate = UpdateController;
+            instance.Init();
             Controllers.Add(name, instance);
             return this;
         }

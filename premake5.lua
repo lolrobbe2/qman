@@ -96,14 +96,14 @@ architecture "x64"
       language "C#"
       targetdir "bin/%{cfg.buildcfg}"
       files { "%{prj.name}/src/**.cs" } -- Include all C# source files
-      nuget { "Avalonia:11.3.11","Avalonia.Desktop:11.3.11","Avalonia.Themes.Simple:11.3.11" }
+      nuget { "Avalonia:11.3.11","Avalonia.Desktop:11.3.11","Avalonia.Themes.Simple:11.3.11","TextCopy:6.2.1" }
       vsprops {
          PublishSingleFile = "true",
          SelfContained = "true",
          IncludeNativeLibrariesForSelfExtract = "true",
          PublishTrimmed =  "true",
          Nullable = "enable",
-         AllowUnsafe = "true"
+         AllowUnsafe = "true",
       }
       links {"qman-lib"}
 

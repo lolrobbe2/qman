@@ -3,23 +3,29 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Styling;
+using Avalonia.Threading;
 using qman.src.lib;
 using qmanlib.src.storage.models;
 using qmanlib.src.storage.qdb;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
+using TextCopy;
 
 namespace qman.src.controllers.ModulesView
 {
     internal class ModulesView : Controller
     {
         private DataTransfer dataTransfer = new DataTransfer();
+        private DataTransfer clipBoard = new DataTransfer();
 
         private static string filter { get; set; } = "";
         private DockPanel sidebar = new DockPanel();
@@ -85,16 +91,41 @@ namespace qman.src.controllers.ModulesView
                 {
                     if (presenter.Content is PlaceTreeNode node)
                     {
-                        Console.WriteLine("hello");
+                        if (node.NodeId != -1)
+                        {
+                            foreach (var item in dataTransfer.Items)
+                            {
+                                GlobalState.repositories!.Modules.SetModuleParent(node.NodeId, item.TryGetText() ?? "");
+                            }
+                        }
+
                     }
                 }
             }
         }
- 
+
+        [DllImport("ole32.dll", ExactSpelling = true)]
+        private static extern int CoInitialize(IntPtr pvReserved);
+        private async void OnKeyPressed(object? sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.C && e.KeyModifiers == KeyModifiers.Control)
+            {
+                if (e.Source is Visual visual && sender is TreeView treeView)
+                {
+                    if (treeView.SelectedItem is PlaceTreeNode node && topLevel!.Clipboard != null)
+                    {
+
+
+                        ClipboardService.SetText(node.Title);
+                    }
+                }
+            }
+        }
+
         private async void OnPointerPressed(object? sender, PointerPressedEventArgs e)
         {
             // Check if it's the left mouse button
-            if (e.GetCurrentPoint(sender as Visual).Properties.IsLeftButtonPressed)
+            if (e.GetCurrentPoint(sender as Visual).Properties.IsMiddleButtonPressed)
             {
                 // Try to find the node that was clicked
 
@@ -102,10 +133,11 @@ namespace qman.src.controllers.ModulesView
                 {
                     if (treeView.SelectedItem is PlaceTreeNode node)
                     {
+                        dataTransfer = new DataTransfer();
                         dataTransfer.Add(DataTransferItem.CreateText(node.Title));
                         var result = await DragDrop.DoDragDropAsync(e, dataTransfer, DragDropEffects.Move);
-                        Console.WriteLine("dragged");
-                    }
+                        CreateModuleTree(ref sidebar);
+                    } 
                 }
 
             }
@@ -145,6 +177,7 @@ namespace qman.src.controllers.ModulesView
 
             // 1. Point to the static Event Definition, then the Method Name
             treeView.AddHandler(InputElement.PointerPressedEvent, OnPointerPressed, RoutingStrategies.Tunnel);
+            treeView.AddHandler(InputElement.KeyDownEvent, OnKeyPressed, RoutingStrategies.Tunnel);
             DragDrop.AddDropHandler(treeView, DropHandler);
             DragDrop.SetAllowDrop(treeView, true);
         }
