@@ -11,12 +11,13 @@ namespace qmanlib.src.storage.qdb
         private MdbTables Tables => Handle.Tables;
         public IList<QdbController> Controllers { get; init; }
         public IList<QdbModule> Modules { get; init; }
-
+        public IList<QdbPlace> Places { get; init; }
         public QbusDatabase(MdbConnection handle)
         {
             Handle = handle;
             Controllers = GetControllers();
             Modules = GetModules();
+            Places = GetPlaces();
         }
         private IList<QdbController> GetControllers()
         {
@@ -39,6 +40,17 @@ namespace qmanlib.src.storage.qdb
                 modules.Add(new QdbModule(item));
             }
             return modules;
+        }
+        private IList<QdbPlace> GetPlaces()
+        {
+            MdbTable table = Tables["Plaatsen"];
+            MdbRows rows = table.Rows;
+            IList<QdbPlace> places = new List<QdbPlace>();
+            foreach (var item in rows)
+            {
+                places.Add(new QdbPlace(item));
+            }
+            return places;
         }
     }
 }

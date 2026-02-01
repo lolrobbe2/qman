@@ -3,6 +3,7 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using qman.src.lib;
 using qmanlib.src.storage.qdb;
+using qmanlib.src.storage.repositories;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -46,7 +47,8 @@ namespace qman.src.controllers
                 }
             };
             IReadOnlyList<IStorageFile> files = await topLevel?.StorageProvider.OpenFilePickerAsync(options)!;
-            GlobalState.currentDb = QbusDatbaseReader.Open(files[0].TryGetLocalPath()!);
+            QbusDatabase db = QbusDatbaseReader.Open(files[0].TryGetLocalPath()!);
+            GlobalState.repositories = new CommonRepostories(db);
             UpdateAllContent();
         }
 

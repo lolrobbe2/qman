@@ -26,7 +26,7 @@ namespace qman.src.lib
             return this;
         }
 
-        public MenuBarBuilder AddItem(string header, EventHandler<RoutedEventArgs>? onClick = null)
+        public MenuBarBuilder AddItem(string header, EventHandler<RoutedEventArgs>?  onClick = null)
         {
             if (_currentMenu == null)
                 throw new InvalidOperationException("Call AddMenu before adding items.");

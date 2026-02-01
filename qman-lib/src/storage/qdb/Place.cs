@@ -14,7 +14,6 @@ namespace qmanlib.src.storage.qdb
     }
     public class QdbPlace : Place
     {
-
         public QdbPlace(MdbDataRow item)
         {
             ID = item.GetInt16((int)QdbPlaceIndex.Id);

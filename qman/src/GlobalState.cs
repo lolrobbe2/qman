@@ -1,4 +1,5 @@
 ﻿using qmanlib.src.storage.qdb;
+using qmanlib.src.storage.repositories;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,6 +11,6 @@ namespace qman.src
     /// </summary>
     public class GlobalState
     {
-        public static QbusDatabase? currentDb { get; set; }
+        public static CommonRepostories? repositories { get; set; }
     }
 }
