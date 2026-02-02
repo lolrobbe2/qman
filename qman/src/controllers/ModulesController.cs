@@ -15,6 +15,7 @@ namespace qman.src.controllers
         public override void Init()
         {
             AddController<ModulesView.ModulesView>("modules_view");
+            AddController<OutputsView.OutputsView>("outputs_view");
         }
     }
 }

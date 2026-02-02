@@ -28,6 +28,10 @@ namespace qmanlib.src.storage.repositories
         {
             return Modules.Where((module) => module.LocationId == place.ID);
         }
+        public Module? GetModuleById(Int16 id)
+        {
+            return Modules.Where((module) => module.Id == id).First();
+        }
 
         public void SetModuleParent(Int16 place, string name)
         {

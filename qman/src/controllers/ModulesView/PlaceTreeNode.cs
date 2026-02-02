@@ -17,7 +17,7 @@ namespace qman.src.controllers.ModulesView
 {
     internal class PlaceTreeNode : Control
     {
-        bool IsPlace { get; set; }
+        public bool IsPlace { get; set; }
         public Int16 NodeId { get; set; } = -1;
         public string Title { get; init; }
         List<PlaceTreeNode> Children { get; set; } = new List<PlaceTreeNode>();
@@ -40,10 +40,11 @@ namespace qman.src.controllers.ModulesView
                     Children.Add(new PlaceTreeNode(item));
             }
         }
-        public PlaceTreeNode(Module place)
+        public PlaceTreeNode(Module module)
         {
             IsPlace = false;
-            Title = place.Location;
+            Title = module.Location;
+            NodeId = module.Id;
         }
 
 

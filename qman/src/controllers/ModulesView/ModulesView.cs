@@ -138,7 +138,18 @@ namespace qman.src.controllers.ModulesView
                     } 
                 }
 
-            }
+            } 
+            else if(e.GetCurrentPoint(sender as Visual).Properties.IsLeftButtonPressed)
+            {
+                if (e.Source is Visual visual && sender is TreeView treeView)
+                {
+                    if (treeView.SelectedItem is PlaceTreeNode node && !node.IsPlace)
+                    {
+                        GlobalState.currentSelected = GlobalState.repositories!.Modules.GetModuleById(node.NodeId);
+                        UpdateContent();
+                    }
+                }
+                    }
         }
         private void CreateModuleTree(ref DockPanel parent)
         {

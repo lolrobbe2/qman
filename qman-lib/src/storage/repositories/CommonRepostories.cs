@@ -13,11 +13,13 @@ namespace qmanlib.src.storage.repositories
         #region repositories
         public ModulesRepository Modules { get; init; }
         public PlacesRepository Places { get; init; }
+        public OutputsRepository Outputs { get; init; }
         #endregion
         public CommonRepostories(QbusDatabase dataBase)
         {
             Modules = new ModulesRepository(dataBase.Modules);
             Places = new PlacesRepository(dataBase.Places);
+            Outputs = new OutputsRepository(dataBase.Outputs);
         }
     }
 }

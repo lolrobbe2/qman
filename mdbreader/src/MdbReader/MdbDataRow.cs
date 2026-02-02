@@ -203,40 +203,29 @@ public sealed partial class MdbDataRow
 
         foreach (MdbColumn col in Columns)
         {
-            /*
-            object? valueToSet = col.Type switch
-            {
-                MdbColumnType.Boolean => GetBoolean(col.Index),
-                MdbColumnType.Byte => GetByte(col.Index),
-                MdbColumnType.Int => GetString(col.Index),
-                MdbColumnType.LongInt => GetInt32(col.Index),
-                MdbColumnType.Currency => GetNullableDecimal(col.Index),
-                MdbColumnType.Single => GetSingle(col.Index),
-                MdbColumnType.Double => GetDouble(col.Index),
-                MdbColumnType.DateTime => GetDateTime(col.Index),
-                MdbColumnType.Binary => GetString(col.Index),
-                MdbColumnType.Text => GetString(col.Index),
-                MdbColumnType.Memo => GetString(col.Index),
-                MdbColumnType.Numeric => GetDecimal(col.Index),
-                MdbColumnType.Complex => GetInt32(col.Index),
-                _ => null
-            };
-            */
             object? valueToSet = GetValue(col.Name);
             if (TryExtractNameAndNumber(col.Name, out string name, out int number))
             {
                 PropertyInfo? prop = type?.GetProperty(name, BindingFlags.Public | BindingFlags.Instance);
-
-                var arrayInstance = prop.GetValue(instance) as Array;
-
-                if (arrayInstance != null && number < arrayInstance.Length)
+                if (prop == null && type != null)
                 {
+                    prop = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                               .FirstOrDefault(p => p.GetCustomAttribute<MdbParamAttribute>()?.Name == name);
+                }
+                if (prop == null)
+                    Console.WriteLine($"could not find: [MdbParam(\"{col.Name}\")] {col.Type.ToString()}");
+                else
+                {
+                    var arrayInstance = prop.GetValue(instance) as Array;
 
 
-                    // 2. Set the value at the specific index
-                    if (valueToSet != null)
+                    if (arrayInstance != null && number < arrayInstance.Length)
                     {
-                        arrayInstance.SetValue(valueToSet, number);
+                        // 2. Set the value at the specific index
+                        if (valueToSet != null)
+                        {
+                            arrayInstance.SetValue(valueToSet, number);
+                        }
                     }
                 }
             }
@@ -248,7 +237,10 @@ public sealed partial class MdbDataRow
                     prop = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                                .FirstOrDefault(p => p.GetCustomAttribute<MdbParamAttribute>()?.Name == col.Name);
                 }
-                prop!.SetValue(instance, valueToSet);
+                if(prop == null)
+                    Console.WriteLine($"could not find: [MdbParam(\"{col.Name}\")] {col.Type.ToString()}");
+                else
+                    prop!.SetValue(instance, valueToSet);
             }
         }
         return instance;

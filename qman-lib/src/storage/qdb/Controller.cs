@@ -9,11 +9,14 @@ namespace qmanlib.src.storage.qdb
     [MdbRow]
     public class QdbController
     {
-        [MdbParam("adres")]        
-        
+        [MdbParam("adres")]
+
         public byte addres { get; set; }
         public string? mode { get; set; }
-
+        public byte lcdlink { get; set; }
+        public IList<int> output { get; set; } = new List<int>(8);
+        public string? gewijzigd { get; set; }
+        public int ControllerId { get; set; }
         private enum ParamIndex : int
         {
             ADRES,
