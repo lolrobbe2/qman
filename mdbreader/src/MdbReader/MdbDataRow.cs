@@ -201,10 +201,10 @@ public sealed partial class MdbDataRow
         }
         T instance = new T();
 
-        foreach (MdbColumn col in Columns)
-        {
-            object? valueToSet = GetValue(col.Name);
-            if (TryExtractNameAndNumber(col.Name, out string name, out int number))
+        for(int index = 0; index < Columns.Count(); index++) 
+        { 
+            IMdbValue? valueToSet = FieldValues.ElementAt(index);
+            if (TryExtractNameAndNumber(valueToSet.Column.Name, out string name, out int number))
             {
                 PropertyInfo? prop = type?.GetProperty(name, BindingFlags.Public | BindingFlags.Instance);
                 if (prop == null && type != null)
@@ -212,35 +212,42 @@ public sealed partial class MdbDataRow
                     prop = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                                .FirstOrDefault(p => p.GetCustomAttribute<MdbParamAttribute>()?.Name == name);
                 }
+          
+
                 if (prop == null)
-                    Console.WriteLine($"could not find: [MdbParam(\"{col.Name}\")] {col.Type.ToString()}");
+                    Console.WriteLine($"could not find: [MdbParam(\"{valueToSet.Column.Name}\")] {valueToSet.GetType().ToString()}");
                 else
                 {
                     var arrayInstance = prop.GetValue(instance) as Array;
-
+                   
 
                     if (arrayInstance != null && number < arrayInstance.Length)
                     {
-                        // 2. Set the value at the specific index
                         if (valueToSet != null)
                         {
-                            arrayInstance.SetValue(valueToSet, number);
+                            // Get the type of elements the array is supposed to hold
+                            Type elementType = arrayInstance.GetType().GetElementType();
+
+                            // Convert valueToSet to the correct element type
+                            object convertedValue = Convert.ChangeType(valueToSet.Value, elementType);
+
+                            arrayInstance.SetValue(convertedValue, number);
                         }
                     }
                 }
             }
             else
             {
-                PropertyInfo? prop = type?.GetProperty(col.Name, BindingFlags.Public | BindingFlags.Instance);
+                PropertyInfo? prop = type?.GetProperty(valueToSet.Column.Name, BindingFlags.Public | BindingFlags.Instance);
                 if (prop == null && type != null)
                 {
                     prop = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                               .FirstOrDefault(p => p.GetCustomAttribute<MdbParamAttribute>()?.Name == col.Name);
+                               .FirstOrDefault(p => p.GetCustomAttribute<MdbParamAttribute>()?.Name == valueToSet.Column.Name);
                 }
                 if(prop == null)
-                    Console.WriteLine($"could not find: [MdbParam(\"{col.Name}\")] {col.Type.ToString()}");
+                    Console.WriteLine($"could not find: [MdbParam(\"{valueToSet.Column.Name}\")] {valueToSet.GetType().ToString()}");
                 else
-                    prop!.SetValue(instance, valueToSet);
+                    prop!.SetValue(instance, valueToSet.Value);
             }
         }
         return instance;

@@ -35,7 +35,7 @@ namespace qman.src.controllers.ModulesView
             // 2. Initialize the Grid with your 10% / 90% split
             var mainGrid = new Grid
             {
-                ColumnDefinitions = new ColumnDefinitions("10*, 90*")
+                ColumnDefinitions = new ColumnDefinitions("15*, 85*")
             };
 
             // 3. Create the components using helper functions
@@ -104,17 +104,25 @@ namespace qman.src.controllers.ModulesView
             }
         }
 
-        [DllImport("ole32.dll", ExactSpelling = true)]
-        private static extern int CoInitialize(IntPtr pvReserved);
         private async void OnKeyPressed(object? sender, KeyEventArgs e)
         {
             if(e.Key == Key.C && e.KeyModifiers == KeyModifiers.Control)
             {
                 if (e.Source is Visual visual && sender is TreeView treeView)
                 {
-                    if (treeView.SelectedItem is PlaceTreeNode node && topLevel!.Clipboard != null)
+                    if (treeView.SelectedItem is PlaceTreeNode node)
                     {
                         ClipboardService.SetText(node.Title);
+                    }
+                }
+            }
+            else if (e.Key == Key.F2)
+            {
+                if (e.Source is Visual visual && sender is TreeView treeView)
+                {
+                    if (treeView.SelectedItem is PlaceTreeNode node)
+                    {
+                        node.IsEditing = true;
                     }
                 }
             }
@@ -149,7 +157,7 @@ namespace qman.src.controllers.ModulesView
                         UpdateContent();
                     }
                 }
-                    }
+            }
         }
         private void CreateModuleTree(ref DockPanel parent)
         {

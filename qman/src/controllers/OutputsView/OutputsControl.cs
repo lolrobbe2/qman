@@ -48,11 +48,6 @@ namespace qman.src.controllers.OutputsView
         {
             HorizontalAlignment = HorizontalAlignment.Stretch;
             VerticalAlignment = VerticalAlignment.Stretch;
-
-            // Set a Minimum height/width so it doesn't disappear if empty
-            MinHeight = 100;
-            MinWidth = 120;
-
             Margin = new Thickness(5);
 
             // We use a property listener to swap the content when Output changes
@@ -80,6 +75,7 @@ namespace qman.src.controllers.OutputsView
                 BorderBrush = Brushes.LightGray,
                 BorderThickness = new Thickness(1),
                 Padding = new Thickness(10),
+                HorizontalAlignment = HorizontalAlignment.Stretch,// Stretch panel inside ScrollViewer
                 Child = new StackPanel
                 {
                     HorizontalAlignment = HorizontalAlignment.Stretch,// Stretch panel inside ScrollViewer
@@ -97,7 +93,7 @@ namespace qman.src.controllers.OutputsView
                             TextTrimming = TextTrimming.CharacterEllipsis
                         },
                         new TextBlock {
-                            Text = $"{Output?.id} | ID: {Output?.LocationID}",
+                            Text = $"{Output?.id}",
                             FontSize = 11
                         }
                     }

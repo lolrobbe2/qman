@@ -117,3 +117,28 @@ architecture "x64"
          symbols "Off"
          defines { "NDEBUG" }
          optimize "On"
+
+project "qman-controller"
+      kind "ConsoleApp" -- CLI application
+      dotnetframework "net10.0" -- Targeting .NET 9.0
+      location "qman-controller"
+      language "C#"
+      targetdir "bin/%{cfg.buildcfg}"
+      files { "%{prj.name}/src/**.cs" } -- Include all C# source files
+      nuget { "Spectre.Console.Cli:0.50.0", "StreamJsonRpc:2.22.11" }
+      links {"qman-lib"}
+      vsprops {
+         PublishSingleFile = "true",
+         SelfContained = "true",
+         IncludeNativeLibrariesForSelfExtract = "true",
+         PublishTrimmed =  "true",
+         Nullable = "enable"
+      }
+      filter "configurations:Debug"
+         defines { "DEBUG" }
+         optimize "Off"
+      
+      filter "configurations:Release"
+         symbols "Off"
+         defines { "NDEBUG" }
+         optimize "On"

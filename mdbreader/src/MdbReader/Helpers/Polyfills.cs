@@ -24,7 +24,16 @@ internal static class MdbBinary
     /// <inheritdoc cref="BinaryPrimitives.ReadInt16LittleEndian(ReadOnlySpan{byte}) "/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static short ReadInt16LittleEndian(ReadOnlySpan<byte> source)
-    => BinaryPrimitives.ReadInt16LittleEndian(source);
+    {
+        try
+        {
+            return BinaryPrimitives.ReadInt16LittleEndian(source);
+        }
+        catch (ArgumentOutOfRangeException exception)
+        {
+            return 0;
+        }
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static byte ReadByte(ReadOnlySpan<byte> source)

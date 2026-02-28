@@ -173,10 +173,10 @@ internal abstract class MdbValue<TVal> : IMdbValue<TVal>
             throw new ArgumentException($"Invalid length {binaryValue.Length}.", nameof(binaryValue));
         if (allowableType != column.Type)
             throw new ArgumentException($"Could not convert field value type {column.Type} to {allowableType}", nameof(column));
-
+        
         Column = column;
         IsNull = isNull;
-        BinaryValue = (isNull ? ReadOnlySpan<byte>.Empty : binaryValue).ToArray();
+        BinaryValue = binaryValue.ToArray();
     }
 
     /// <summary>

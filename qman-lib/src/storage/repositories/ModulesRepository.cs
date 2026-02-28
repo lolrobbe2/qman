@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -11,6 +12,7 @@ namespace qmanlib.src.storage.repositories
     {
         private IList<Module> Modules { get; init; }
 
+        public Module this[int id] => Modules.First(m => m.Id == id);   
         public ModulesRepository(IEnumerable<Module> modules)
         {
             Modules = new List<Module>(modules);
@@ -39,6 +41,12 @@ namespace qmanlib.src.storage.repositories
                 return;
             int index = Modules.IndexOf(Modules.First((module) => module.Location == name));
             Modules[index].LocationId = place;
+        }
+        public void SetModuleName(int id, string name)
+        {
+            for (int i = 0; i < Modules.Count; i++)
+                if (Modules[i].Id == id)
+                    Modules[i].Location = name;
         }
     }
 }

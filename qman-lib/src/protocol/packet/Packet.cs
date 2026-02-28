@@ -18,7 +18,7 @@ namespace qmanlib.protocol.packet
 
         public Packet(COMMAND command)
         {
-            _prefix = new byte[] { 81, 66, 85, 83, 0, 4, 0, 1, 1 }; // QBUS.....
+            _prefix = new byte[] { 81, 66, 85, 83, 0, 4, 0, 1, 1 }; // QBUS..... 
             _command = command;
         }
 

@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mdbreader", "mdbreader\mdbr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qman-cli", "qman-cli\qman-cli.csproj", "{776C7375-6339-CE80-8C52-BC28787E030F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qman-controller", "qman-controller\qman-controller.csproj", "{E3AC9FFC-4F38-0DC1-5849-90B5C45369C1}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qman-lib", "qman-lib\qman-lib.csproj", "{56927375-425F-CE80-6B78-BC2857A4030F}"
 EndProject
 Global
@@ -27,6 +29,10 @@ Global
 		{776C7375-6339-CE80-8C52-BC28787E030F}.Debug|x64.Build.0 = Debug|x64
 		{776C7375-6339-CE80-8C52-BC28787E030F}.Release|x64.ActiveCfg = Release|x64
 		{776C7375-6339-CE80-8C52-BC28787E030F}.Release|x64.Build.0 = Release|x64
+		{E3AC9FFC-4F38-0DC1-5849-90B5C45369C1}.Debug|x64.ActiveCfg = Debug|x64
+		{E3AC9FFC-4F38-0DC1-5849-90B5C45369C1}.Debug|x64.Build.0 = Debug|x64
+		{E3AC9FFC-4F38-0DC1-5849-90B5C45369C1}.Release|x64.ActiveCfg = Release|x64
+		{E3AC9FFC-4F38-0DC1-5849-90B5C45369C1}.Release|x64.Build.0 = Release|x64
 		{56927375-425F-CE80-6B78-BC2857A4030F}.Debug|x64.ActiveCfg = Debug|x64
 		{56927375-425F-CE80-6B78-BC2857A4030F}.Debug|x64.Build.0 = Debug|x64
 		{56927375-425F-CE80-6B78-BC2857A4030F}.Release|x64.ActiveCfg = Release|x64

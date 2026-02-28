@@ -28,7 +28,9 @@ namespace MMKiwi.MdbReader.Values;
 internal sealed class MdbIntValue : MdbValue<short>, IValueAllowableType
 {
     internal MdbIntValue(MdbColumn column, bool isNull, ReadOnlySpan<byte> binaryValue)
-        : base(column, isNull, binaryValue, 2, 2, AllowableType) { }
+        : base(column, isNull, binaryValue, 2, 2, AllowableType) {
+       
+    }
 
     /// <summary>
     /// The <see cref="MdbColumnType" /> that can be used for this value.

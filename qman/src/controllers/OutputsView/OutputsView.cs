@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
+using Avalonia.Data;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml.Templates;
 using Avalonia.Media;
@@ -9,6 +10,7 @@ using qman.src.lib;
 using qmanlib.src.storage.models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -21,86 +23,79 @@ namespace qman.src.controllers.OutputsView
 
         public override Control? GetContent(ref DockPanel panel)
         {
-            // 1. Handle Null State (No Module Selected)
+            // 1. Handle Null State
             if (current == null || GlobalState.repositories == null)
             {
-                var emptyState = new OutputControl(0, null);
+                var emptyState = new OutputControl(0, null)
+                {
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    VerticalAlignment = VerticalAlignment.Stretch
+                };
                 emptyState.PointerPressed += (s, e) => AddModule();
 
-                // Return centered in a single-cell grid
-                return new Grid { Children = { emptyState } };
+                // Ensure the empty state is docked so it doesn't overlap
+                DockPanel.SetDock(emptyState, Dock.Right);
+                return emptyState;
             }
 
             // 2. Fetch Data
-            IList<Output> outputs = GlobalState.repositories!.Outputs.GetModuleOutputs(current).ToArray();
+            IList<Output?> outputs = GlobalState.repositories!.Outputs.GetModuleOutputs(current).ToArray();
 
-            // 3. Create the Main Grid with Row Definitions
-            var mainGrid = new Grid
+            // 3. Main Container (Grid with Row Definitions)
+            var localGrid = new Grid
             {
-                // Row 0: Auto (takes size of label)
-                // Row 1: * (takes all remaining vertical space)
+                // Row 0: Label (Auto), Row 1: Content (*)
                 RowDefinitions = new RowDefinitions("Auto, *"),
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch
             };
 
-            // Row 0: Module Label
+            // Dock this whole grid to the right side of the parent DockPanel
+            DockPanel.SetDock(localGrid, Dock.Right);
+
+            // 4. Create Label (Row 0)
             var label = new TextBlock
             {
-                Text = current.Location ?? "Unknown Location", // Handle potential nulls
-                VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Left,
+                Text = current.Location ?? "Unknown Location",
                 Margin = new Thickness(10, 5),
                 FontSize = 16,
-                FontWeight = FontWeight.Bold
+                FontWeight = FontWeight.Bold,
             };
-            
             Grid.SetRow(label, 0);
+            localGrid.Children.Add(label);
 
-            // Row 1: The Horizontal Outputs List
-            var scrollViewer = new ScrollViewer
+            // 5. Create the ItemsControl using a UniformGrid (Row 1)
+            // No ScrollViewer used here as requested.
+            var itemsControl = new ItemsControl
             {
-                HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
-                VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
-                // Ensure the scrollviewer itself stretches to fill the Grid cell
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,
-                Content = new ItemsControl
+                ItemsPanel = new FuncTemplate<Panel?>(() => new UniformGrid
                 {
-                    // VerticalAlignment Stretch ensures the cards can be as tall as the row
-                    VerticalAlignment = VerticalAlignment.Stretch,
-                    ItemsPanel = new FuncTemplate<Panel?>(() => new StackPanel
-                    {
-                        Orientation = Orientation.Horizontal,
-                        Spacing = 8,
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        VerticalAlignment = VerticalAlignment.Stretch // Allow items to fill height
-                    }),
-                    ItemsSource = CreateOutputControls(outputs)
-                }
+                    Rows = 1, // Keep everything in one horizontal row
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    VerticalAlignment = VerticalAlignment.Stretch
+                }),
+                ItemsSource = CreateOutputControls(outputs)
             };
-            Grid.SetRow(scrollViewer, 1);
+            Grid.SetRow(itemsControl, 1);
+            localGrid.Children.Add(itemsControl);
 
-            // Add children to grid
-            mainGrid.Children.Add(label);
-            mainGrid.Children.Add(scrollViewer);
-
-            return mainGrid;
+            return localGrid;
         }
-        private List<OutputControl> CreateOutputControls(IList<Output> outputs)
+        private List<OutputControl> CreateOutputControls(IList<Output?> outputs)
         {
             var controls = new List<OutputControl>();
 
             for (int i = 0; i < outputs.Count; i++)
             {
-                controls.Add(new OutputControl(i + 1, outputs[i]));
+                Output? output = outputs[i];
+                var control = new OutputControl(i, output);
+                if(output != null)
+                    control.PointerPressed += (s, e) => AddOutput();
+
+                controls.Add(control);
             }
-
-            // The "Add Output" button (last in the list)
-            var addButton = new OutputControl(outputs.Count + 1, null);
-            addButton.PointerPressed += (s, e) => AddOutput();
-            controls.Add(addButton);
-
             return controls;
         }
 
