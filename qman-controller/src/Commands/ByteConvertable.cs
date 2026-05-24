@@ -12,7 +12,7 @@ namespace qman.controller.src.Commands
         {
 
             int size = Marshal.SizeOf(typeof(T));
-            int Pack = str.GetType().StructLayoutAttribute.Pack;
+            int Pack = str.GetType().StructLayoutAttribute!.Pack;
             byte[] arr = new byte[size];
             IntPtr ptr = Marshal.AllocHGlobal(size);
             Marshal.StructureToPtr(str, ptr, true);

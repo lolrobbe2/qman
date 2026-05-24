@@ -1,10 +1,11 @@
 ﻿using qman.controller.src;
+using src.Commands;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 Console.WriteLine("hello world");
-
+BroadCastHandlers.Initialize();
 var deviceManager = new XPORT();
 
 // Assign your function

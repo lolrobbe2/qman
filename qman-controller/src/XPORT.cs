@@ -1,10 +1,14 @@
 ﻿using qman.controller.src.Commands;
+using src;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,17 +18,21 @@ namespace qman.controller.src
 {
     internal class XPORT
     {
-        private Dictionary<IPAddress, UdpClient> findClients = new Dictionary<IPAddress, UdpClient>();
-        private Dictionary<IPAddress, UdpClient> commandClients = new Dictionary<IPAddress, UdpClient>();
 
-        private Dictionary<IPAddress, TcpListener> tcpListeners = new Dictionary<IPAddress, TcpListener>();
+        private ConcurrentDictionary<IPAddress, XPORTInterface> _interfaces = new ConcurrentDictionary<IPAddress, XPORTInterface>();
+        private ConcurrentDictionary<IPAddress, TcpListener> tcpListeners = new ConcurrentDictionary<IPAddress, TcpListener>();
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]
+        public byte[] _macAddress = new byte[6];
         public bool isListening { get; set; } = false;
         public Action<byte[], IPEndPoint> OnData { get; set; }
-        public XPORT(Int16 udpPort = 30700,Int16 udpCommandPort = 30718, Int16 tcpPort = 8445)
+        public XPORT(UInt16 udpPort = 30700, UInt16 udpCommandPort = 30718, UInt16 tcpPort = 8445)
         {
 
-            BindFindClients(udpPort);
-            BindCommandClients(udpCommandPort);
+            SetMac(0x00, 0x20, 0x4A, 0xBD, 0x2C, 0xD1);
+            foreach (var addr in GetEndpoints())
+            {
+                _interfaces.TryAdd(addr, new XPORTInterface(this,addr, udpPort, udpCommandPort));
+            }
             BindTcpListeners(tcpPort);
         }
         public void start()
@@ -36,44 +44,25 @@ namespace qman.controller.src
             {
                 listener.Value.Start();
             }
+            foreach(XPORTInterface _interface in _interfaces.Values)
+            {
+                _interface.StartListening();
+            }
             Listen();
 
         }
-        private void BindTcpListeners(Int16 tcpPort)
+        private void BindTcpListeners(UInt16 tcpPort)
         {
             List<IPAddress> addresses = GetEndpoints();
             foreach (IPAddress addr in addresses)
             {
                 // Bind to the specific interface IP instead of IPAddress.Any
                 TcpListener listener = new TcpListener(addr, tcpPort);
-                tcpListeners.Add(addr,listener);
+                tcpListeners.TryAdd(addr, listener);
             }
         }
-        private void BindFindClients(Int16 udpPort)
-        {
-            List<IPAddress> addresses = GetEndpoints();
-            foreach(IPAddress addr in addresses) {
-                var findClient = new UdpClient();
-                findClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                findClient.EnableBroadcast = true;
-                IPEndPoint localEndpoint = new IPEndPoint(addr,udpPort);
-                findClient.Client.Bind(localEndpoint);
-                findClients.Add(addr, findClient);
-            }
-        }
-        private void BindCommandClients(Int16 udpPort)
-        {
-            List<IPAddress> addresses = GetEndpoints();
-            foreach (IPAddress addr in addresses)
-            {
-                var commandClient = new UdpClient();
-                commandClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                commandClient.EnableBroadcast = true;
-                IPEndPoint localEndpoint = new IPEndPoint(addr, udpPort);
-                commandClient.Client.Bind(localEndpoint);
-                commandClients.Add(addr, commandClient);
-            }
-        }
+       
+        
         private List<IPAddress> GetEndpoints()
         {
             List<IPAddress> AddressList = new List<IPAddress>();
@@ -93,76 +82,26 @@ namespace qman.controller.src
             }
             return AddressList;
         }
-
+        #region UDP_LISTEN
         private void Listen()
         {
-            Task.Run(() => { // Inside your start / initialization routine:
-                foreach (var kvp in findClients)
-                {
-                    UdpClient client = kvp.Value;
-
-                    // Pass the individual adapter client into its dedicated async loop runner
-                    Task.Run(async () => await FindListener(client));
-                }
-            });
-            Task.Run(() => {
-                foreach (var kvp in commandClients)
-                {
-                    UdpClient client = kvp.Value;
-
-                    // Pass the individual adapter client into its dedicated async loop runner
-                    Task.Run(async () => await CommandListener(client));
-                }
-            });
-
-            Task.Run(() =>
+           
+            while (isListening)
             {
-                while (isListening)
+                foreach (var listener in tcpListeners)
                 {
-                    foreach (var listener in tcpListeners)
+                    if (listener.Value.Pending())
                     {
-                        if (listener.Value.Pending())
-                        {
-                            _ = HandleTcpClientAsync(listener.Value.AcceptTcpClient());
-                        }
+                        _ = HandleTcpClientAsync(listener.Value.AcceptTcpClient());
                     }
-                    // Small sleep to prevent 100% CPU usage on this thread
-                    System.Threading.Thread.Sleep(10);
                 }
-            }).Wait();
-        }
-
-        private async Task FindListener(UdpClient client)
-        {
-            while (isListening)
-            {
-                try
-                {
-                    // FIX: Await the specific interface client passed into the parameter, not the old global field
-                    UdpReceiveResult result = await client.ReceiveAsync();
-                    await DataCommandHandler(result.Buffer, result.RemoteEndPoint,client.Client.LocalEndPoint);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.ToString());
-                }
+                // Small sleep to prevent 100% CPU usage on this thread
+                System.Threading.Thread.Sleep(10);
             }
+        
         }
-        private async Task CommandListener(UdpClient client)
-        {
-            while (isListening)
-            {
-                try
-                {
-                    UdpReceiveResult result = await client.ReceiveAsync();
-                    await DataCommandHandler(result.Buffer, result.RemoteEndPoint,client.Client.LocalEndPoint);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.ToString());
-                }
-            }
-        }
+        #endregion
+        
         private async Task HandleTcpClientAsync(TcpClient client)
         {
             using (client)
@@ -181,72 +120,52 @@ namespace qman.controller.src
                 }
             }
         }
-        private async Task DataCommandHandler(byte[] received, IPEndPoint endPoint, EndPoint? localEndPoint)
+       
+
+        #region MAC_ADDR
+        #region SET
+        public void SetMac(byte[] mac)
         {
-            if (received.Length == 1)
+            if (mac == null || mac.Length != 6)
+                throw new ArgumentException("MAC address must be exactly 6 bytes.");
+            _macAddress = (byte[])mac.Clone();
+        }
+
+        // 2. Set using a Hex String (e.g., "00204ABD2CD1")
+        public void SetMac(string macString)
+        {
+            // Remove colons or dashes if present
+            string cleanMac = macString.Replace(":", "").Replace("-", "");
+
+            if (cleanMac.Length != 12)
+                throw new ArgumentException("MAC string must be 12 hex characters.");
+
+            for (int i = 0; i < 6; i++)
             {
-                 //when the data lenght is 1 we have received a XPORT command
-                XPORT_BROADCAST_COMMANDS command = (XPORT_BROADCAST_COMMANDS)received[0];
-                Console.WriteLine($"command {command}");
-                switch (command)
-                {
-                    case XPORT_BROADCAST_COMMANDS.NODE_FIND:
-                        FindResponse myIdentity = new FindResponse();
-
-                        if (localEndPoint is IPEndPoint localEP)
-                        {
-                            myIdentity.SetIP(localEP.Address);
-                        }
-
-                        myIdentity.SetMac(new byte[] { 0x00, 0x20, 0x4A, 0xBD, 0x2C, 0xD1 });
-                        myIdentity.SubnetMaskBits = 24; // 255.255.255.0
-                        myIdentity.HardwareID1 = 0x02; // XPort ID
-                        myIdentity.HardwareID2 = 0x01;
-                        myIdentity.SetName("LaMa");
-                        foreach (UdpClient client in findClients.Values)
-                        {
-                            try
-                            {
-                                client.Send(myIdentity.ToBuffer(), endPoint);
-                            } catch(Exception){
-
-                            }
-                        }
-                        break;
-                }
-            } 
-            else
-            {
-                BroadcastCommandStruct command = BroadcastCommandStruct.FromBytes(received);
-                Console.WriteLine($"command {command.command}");
-                switch (command.command)
-                {
-                    case XPORT_BROADCAST_COMMANDS.FIRMWARE_QUERRY:
-                        FirmawareResponseStruct response = new FirmawareResponseStruct();
-                        if (localEndPoint is IPEndPoint localEP)
-                        {
-                            response.SetIP(localEP.Address);
-                        }
-                        response.macAddress = new byte[] { 0x00, 0x20, 0x4A, 0xBD, 0x2C, 0xD1 };
-                        response.SetVersion(0, 6, 0, 9);
-                        response.command.reboot = 0;
-                        response.command.command = XPORT_BROADCAST_COMMANDS.FIRMWARE_RESPONSE;
-                        var res = response.ToBuffer();
-
-                        foreach (UdpClient client in commandClients.Values)
-                        {
-                            try
-                            {
-                                client.Send(res, endPoint);
-                            }
-                            catch (Exception)
-                            {
-
-                            }
-                        }
-                        break;
-                }
+                _macAddress[i] = Convert.ToByte(cleanMac.Substring(i * 2, 2), 16);
             }
         }
+
+        public void SetMac(byte b1, byte b2, byte b3, byte b4, byte b5, byte b6)
+        {
+            _macAddress[0] = b1;
+            _macAddress[1] = b2;
+            _macAddress[2] = b3;
+            _macAddress[3] = b4;
+            _macAddress[4] = b5;
+            _macAddress[5] = b6;
+        }
+
+        // Optional: Get it as a formatted string for logs
+        public string MacString()
+        {
+            return BitConverter.ToString(_macAddress).Replace("-", ":");
+        }
+        #endregion
+        public byte[] GetMac()
+        {
+            return _macAddress;
+        }
+        #endregion
     }
 }
