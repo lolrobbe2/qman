@@ -20,11 +20,9 @@ namespace qman.controller.src
     {
 
         private ConcurrentDictionary<IPAddress, XPORTInterface> _interfaces = new ConcurrentDictionary<IPAddress, XPORTInterface>();
-        private ConcurrentDictionary<IPAddress, TcpListener> tcpListeners = new ConcurrentDictionary<IPAddress, TcpListener>();
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 6)]
         public byte[] _macAddress = new byte[6];
         public bool isListening { get; set; } = false;
-        public Action<byte[], IPEndPoint> OnData { get; set; }
         public XPORT(UInt16 udpPort = 30700, UInt16 udpCommandPort = 30718, UInt16 tcpPort = 8445)
         {
 
@@ -33,36 +31,20 @@ namespace qman.controller.src
             {
                 _interfaces.TryAdd(addr, new XPORTInterface(this,addr, udpPort, udpCommandPort));
             }
-            BindTcpListeners(tcpPort);
         }
         public void start()
         {
             if (isListening) return;
             isListening = true;
             // Start the async loop without blocking the main thread
-            foreach (var listener in tcpListeners)
-            {
-                listener.Value.Start();
-            }
             foreach(XPORTInterface _interface in _interfaces.Values)
             {
                 _interface.StartListening();
             }
-            Listen();
+        }
 
-        }
-        private void BindTcpListeners(UInt16 tcpPort)
-        {
-            List<IPAddress> addresses = GetEndpoints();
-            foreach (IPAddress addr in addresses)
-            {
-                // Bind to the specific interface IP instead of IPAddress.Any
-                TcpListener listener = new TcpListener(addr, tcpPort);
-                tcpListeners.TryAdd(addr, listener);
-            }
-        }
+
        
-        
         private List<IPAddress> GetEndpoints()
         {
             List<IPAddress> AddressList = new List<IPAddress>();
@@ -82,45 +64,6 @@ namespace qman.controller.src
             }
             return AddressList;
         }
-        #region UDP_LISTEN
-        private void Listen()
-        {
-           
-            while (isListening)
-            {
-                foreach (var listener in tcpListeners)
-                {
-                    if (listener.Value.Pending())
-                    {
-                        _ = HandleTcpClientAsync(listener.Value.AcceptTcpClient());
-                    }
-                }
-                // Small sleep to prevent 100% CPU usage on this thread
-                System.Threading.Thread.Sleep(10);
-            }
-        
-        }
-        #endregion
-        
-        private async Task HandleTcpClientAsync(TcpClient client)
-        {
-            using (client)
-            {
-                NetworkStream stream = client.GetStream();
-                byte[] buffer = new byte[1024];
-                while (client.Connected)
-                {
-                    int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
-                    if (bytesRead == 0) break; // Client disconnected
-
-                    // This is where your actual "Serial Data" goes
-                    byte[] data = new byte[bytesRead];
-                    Array.Copy(buffer, data, bytesRead);
-
-                }
-            }
-        }
-       
 
         #region MAC_ADDR
         #region SET
@@ -165,6 +108,13 @@ namespace qman.controller.src
         public byte[] GetMac()
         {
             return _macAddress;
+        }
+        public void RegisterIncommingConnectionHandler(Action<TcpClient> action)
+        {
+            foreach (var interfacePair in _interfaces)
+            {
+                interfacePair.Value.RegisterIncommingConnectionHandler(action);
+            }
         }
         #endregion
     }

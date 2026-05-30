@@ -1,6 +1,6 @@
 require "vstudio"
 function platformsElement(cfg)
-   _p(2,'<Platforms>x64</Platforms>')
+   _p(2,'<Platforms>x64;AnyCpu</Platforms>')
 end
 
 premake.override(premake.vstudio.cs2005.elements, "projectProperties", function (oldfn, cfg)
@@ -11,11 +11,12 @@ end)
 
 
 workspace "qman"
-architecture "x64"
+architecture "x86_64"
    configurations { "Debug", "Release" }
    startproject "qman"
 
    project "mdbreader"
+      clr "Unsafe"
       kind "SharedLib" -- CLI application
       dotnetframework "net10.0" -- Targeting .NET 9.0
       location "mdbreader"
@@ -142,3 +143,9 @@ project "qman-controller"
          symbols "Off"
          defines { "NDEBUG" }
          optimize "On"
+
+   externalproject "qman_native"
+      location "qman_native"
+      kind "WindowedApp"
+      language "C#"
+      filename "qman_native"

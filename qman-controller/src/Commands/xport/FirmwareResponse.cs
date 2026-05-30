@@ -1,11 +1,12 @@
-﻿using System;
+﻿using qman.controller.src.Commands;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace qman.controller.src.Commands
+namespace src.Commands.xport
 {
     [DebuggerDisplay("Ip: {_ip[0]}.{_ip[1]}.{_ip[3]}.{_ip[4]} | Reboot: {reboot}")]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

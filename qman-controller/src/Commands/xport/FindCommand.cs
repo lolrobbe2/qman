@@ -1,11 +1,12 @@
-﻿using System;
+﻿using qman.controller.src.Commands;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace qman.controller.src.Commands
+namespace src.Commands.xport
 {
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

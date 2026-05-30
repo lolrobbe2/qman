@@ -1,0 +1,61 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace src.Commands.controller
+{
+    public enum QBUS_COMMAND_TYPE : byte
+    {
+        SERVICE = 0,
+        CONTROL_PARAMETERS = 1,
+        ADDRESS_PARAMETERS = 2,
+        WORK_TEXT = 3,
+        ADDRESS_TEXT = 4,
+        CHANNEL_LIST_TEXT = 5,
+        RTC_CLOCK = 6,
+        VERSION = 7,
+        DATE = 8,
+        FAT_DATA = 9,
+        SWAP_CTL = 10, // 0x0000000A
+        CLEAR_POWERDOWN_TIME = 11, // 0x0000000B
+        FIRMWARE_UPLOAD = 12, // 0x0000000C
+        CONTROLLER_OPTIONS = 13, // 0x0000000D
+        CONTROLLER_CLEAR = 14, // 0x0000000E
+        CONTROLLER_REBOOT = 15, // 0x0000000F
+        PRESET_CLEAR = 16, // 0x00000010
+        PRESET_DATA = 17, // 0x00000011
+        MINI_PRESET_PARAMETERS = 18, // 0x00000012
+        PRESET_PARAMETERS = 19, // 0x00000013
+        HOUR_COUNTERS = 20, // 0x00000014
+        CLOCK_CLEAR = 23, // 0x00000017
+        SCHEDULE_DATA = 24, // 0x00000018
+        HOLIDAY = 25, // 0x00000019
+        EVENT_LOGS = 26, // 0x0000001A
+        LOGIC = 32, // 0x00000020
+        LOGIC_ANALOG = 33, // 0x00000021
+        JAGA_DB = 34, // 0x00000022
+        MODULE_SRAM = 40, // 0x00000028
+        MODULE_EEPROM = 41, // 0x00000029
+        MODULE_FLASH = 42, // 0x0000002A
+        SIMULATION_DATA = 44, // 0x0000002C
+        CHANNEL_LIST_MENU = 48, // 0x00000030
+        CHANNEL_LIST_DATA = 49, // 0x00000031
+        EXTERNAL_CHANNEL_LIST_DATA = 50, // 0x00000032
+        ROOM = 51, // 0x00000033
+        EVENT_READ = 52, // 0x00000034
+        EVENTS = 53, // 0x00000035
+        ADDRESS_STATUS = 56, // 0x00000038
+        CHANNEL_STATUS = 57, // 0x00000039
+        EXTERNAL_CHANNEL_STATUS = 58, // 0x0000003A
+        ADDRESS_MODE = 59, // 0x0000003B
+        CHANNEL_MODE = 60, // 0x0000003C
+        SIMULATION = 62, // 0x0000003E
+        SD_SERVICE = 65, // 0x00000041
+        SD_MODULE = 66, // 0x00000042
+        SD_INFO = 67, // 0x00000043
+        SD_DATABASE = 68, // 0x00000044
+        SD_UNKOWN = 69, // 0x00000045
+        SD_COPY_DATA = 70, // 0x00000046
+        COPY_DATA_SD = 71, // 0x00000047
+    };
+}

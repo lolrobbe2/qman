@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace qman.controller.src.Commands
+namespace src.Commands.xport
 {
     [DebuggerDisplay("Cmd: {command} | Reboot: {reboot}")]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

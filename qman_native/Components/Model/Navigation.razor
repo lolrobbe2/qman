@@ -1,0 +1,38 @@
+﻿@using qman_native.src
+@inject NavigationManager NavigationManager
+<nav class="qbus-nav">
+    @foreach (var item in items)
+    {
+        <a class="nav-item"
+                 href="@item.Path"
+                 Match="NavLinkMatch.All">
+            @item.Title
+        </a>
+    }
+</nav>
+@code {
+    private List<NavItem> items = new()
+    {
+        new NavItem { Title = "Home", Path = "/" },
+        new NavItem { Title = "Settings", Path = "/settings" },
+        new NavItem { Title = "Profile", Path = "/profile/1" }
+    };
+
+    private string currentPath;
+
+    protected override void OnInitialized()
+    {
+        currentPath = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+    }
+
+    private bool IsActive(string path)
+    {
+        return currentPath == path.TrimStart('/');
+    }
+
+    private void Navigate(string path)
+    {
+        NavigationManager.NavigateTo(path);
+        currentPath = path.TrimStart('/');
+    }
+}
