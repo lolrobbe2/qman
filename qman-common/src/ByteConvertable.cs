@@ -4,9 +4,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace qman.controller.src.Commands
+namespace src
 {
-    internal struct ByteConvertable
+    public struct ByteConvertable
     {
         public static byte[] GetBytes<T>(T str) where T : struct
         {
@@ -20,5 +20,18 @@ namespace qman.controller.src.Commands
             Marshal.FreeHGlobal(ptr);
             return arr;
         }
+        public static T ByteArrayToStruct<T>(byte[] bytes) where T : struct
+        {
+            GCHandle handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
+            try
+            {
+                return Marshal.PtrToStructure<T>(handle.AddrOfPinnedObject());
+            }
+            finally
+            {
+                handle.Free();
+            }
+        }
+
     }
 }

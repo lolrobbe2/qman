@@ -1,5 +1,4 @@
-﻿using qman.controller.src.Commands;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Runtime.InteropServices;
@@ -10,7 +9,7 @@ namespace src.Commands.xport
 {
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    internal struct FindResponse
+    public struct FindResponse
     {
         // Offset 0-3: Header
 
@@ -53,19 +52,56 @@ namespace src.Commands.xport
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 24)]
         private byte[] _deviceName;
 
-        // --- Fixed Setters for your XPORT simulation ---
+        #region NAME
         public void SetName(string name)
         {
             _deviceName = new byte[24];
             byte[] nameBytes = Encoding.ASCII.GetBytes(name.PadRight(24, '\0'));
             Array.Copy(nameBytes, _deviceName, Math.Min(nameBytes.Length, 24));
         }
+        public string GetName()
+        {
+            if (_deviceName == null)
+                return string.Empty;
 
-        public void SetMac(byte[] mac) => _mac = mac;
+            // Convert bytes → ASCII string, then trim nulls and whitespace
+            return Encoding.ASCII.GetString(_deviceName).TrimEnd('\0', ' ');
+        }
+
+        public string Name { get => GetName(); set => SetName(value); }
+        #endregion
+
+        #region MAC
+        public void SetMac(byte[] mac)
+        {
+            if (mac == null || mac.Length != 6)
+                throw new ArgumentException("MAC address must be exactly 6 bytes.");
+
+            _mac = new byte[6];
+            Array.Copy(mac, _mac, 6);
+        }
+
+        public byte[] GetMac(){
+            return _mac;
+        }
+
+        #endregion
+
+        #region IP
         public void SetIP(IPAddress ip) => _ip = ip.GetAddressBytes();
+        public IPAddress GetIp() => new IPAddress(_ip);
+
+        public IPAddress Address { get => GetIp(); set => SetIP(value); }
+
+        public string GetAddressString(){
+            return $"{_ip[0].ToString()}.{_ip[1].ToString()}.{_ip[2].ToString()}.{_ip[3].ToString()}";
+        }
+        #endregion
         public byte[] ToBuffer()
         {
             return ByteConvertable.GetBytes(this);
         }
+
+
     }
 }

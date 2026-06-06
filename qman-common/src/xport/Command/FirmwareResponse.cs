@@ -1,4 +1,4 @@
-﻿using qman.controller.src.Commands;
+﻿using src.xport;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -36,7 +36,7 @@ namespace src.Commands.xport
             _version = new byte[] { (byte)major, (byte)minor, (byte)revision, (byte)build };
         }
 
-        internal byte[] ToBuffer()
+        public byte[] ToBuffer()
         {
             return ByteConvertable.GetBytes(this);
         }

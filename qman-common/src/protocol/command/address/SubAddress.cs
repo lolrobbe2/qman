@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace qmanlib.protocol.command.address
+namespace src.protocol.command.address
 {
     public enum SUBADDRESS : byte
     {

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace qmanlib.protocol.command.address
+namespace src.protocol.command.address
 {
     public class AddressRead : CommandBase
     {

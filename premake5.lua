@@ -57,6 +57,32 @@ architecture "x86_64"
          Nullable = "enable",
 
       }
+      links {"qman-common"}
+
+      filter "configurations:Debug"
+         defines { "DEBUG" }
+         optimize "Off"
+      
+      filter "configurations:Release"
+         symbols "Off"
+         defines { "NDEBUG" }
+         optimize "On"
+   project "qman-common"
+      kind "SharedLib" -- CLI application
+      dotnetframework "net10.0" -- Targeting .NET 9.0
+      location "qman-common"
+      language "C#"
+      targetdir "bin/%{cfg.buildcfg}"
+      files { "%{prj.name}/src/**.cs" } -- Include all C# source files
+      nuget { "Spectre.Console:0.50.0", "YamlDotNet:16.3.0"}
+      vsprops {
+         PublishSingleFile = "true",
+         SelfContained = "true",
+         IncludeNativeLibrariesForSelfExtract = "true",
+         PublishTrimmed =  "true",
+         Nullable = "enable",
+
+      }
       links {"mdbreader"}
 
       filter "configurations:Debug"
@@ -127,7 +153,7 @@ project "qman-controller"
       targetdir "bin/%{cfg.buildcfg}"
       files { "%{prj.name}/src/**.cs" } -- Include all C# source files
       nuget { "Spectre.Console.Cli:0.50.0", "StreamJsonRpc:2.22.11" }
-      links {"qman-lib"}
+      links {"qman-common"}
       vsprops {
          PublishSingleFile = "true",
          SelfContained = "true",

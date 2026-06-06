@@ -1,0 +1,51 @@
+﻿@typeparam TItem
+
+<div class="drag-drop-container">
+    @foreach (TItem item in Items)
+    {
+        <div class="drag-item"
+             draggable="true"
+             @ondragstart="@(() => OnDragStart(item))"
+             @ondragover:preventDefault
+             @ondrop="@(() => OnDrop(item))">
+
+            @ItemTemplate(item)
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public IList<TItem> Items { get; set; } = [];
+
+    [Parameter]
+    public RenderFragment<TItem> ItemTemplate { get; set; } = default!;
+
+    private TItem? draggedItem;
+
+    private void OnDragStart(TItem item)
+    {
+        draggedItem = item;
+    }
+
+    private void OnDrop(TItem targetItem)
+    {
+        if (draggedItem is null || EqualityComparer<TItem>.Default.Equals(draggedItem, targetItem))
+        {
+            return;
+        }
+
+        Int32 oldIndex = Items.IndexOf(draggedItem);
+        Int32 newIndex = Items.IndexOf(targetItem);
+
+        if (oldIndex < 0 || newIndex < 0)
+        {
+            return;
+        }
+
+        Items.RemoveAt(oldIndex);
+        Items.Insert(newIndex, draggedItem);
+
+        StateHasChanged();
+    }
+}

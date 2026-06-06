@@ -1,4 +1,4 @@
-﻿using qman.controller.src.Commands;
+﻿using src.xport;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -46,7 +46,7 @@ namespace src.Commands.xport
 
             _serialRaw = Encoding.ASCII.GetBytes(formattedSerial).AsSpan<byte>(0,6).ToArray();
         }
-        internal byte[] ToBuffer()
+        public byte[] ToBuffer()
         {
             return ByteConvertable.GetBytes(this);
         }

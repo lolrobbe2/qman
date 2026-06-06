@@ -1,5 +1,5 @@
-﻿using qmanlib.protocol.command.address;
-using qmanlib.protocol.packet;
+﻿using qmanlib.protocol.packet;
+using src.protocol.command.address;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -9,7 +9,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace qmanlib.protocol.command
+namespace src.protocol.command
 {
     internal interface ICommand : IPacket.IPacketData
     {

@@ -8,6 +8,8 @@
   </Project>
   <Project Path="qman-cli\qman-cli.csproj" Id="776C7375-6339-CE80-8C52-BC28787E030F">
   </Project>
+  <Project Path="qman-common\qman-common.csproj" Id="888647A0-F43B-C095-7D30-BA6CE9E4B699">
+  </Project>
   <Project Path="qman-controller\qman-controller.csproj" Id="E3AC9FFC-4F38-0DC1-5849-90B5C45369C1">
   </Project>
   <Project Path="qman-lib\qman-lib.csproj" Id="56927375-425F-CE80-6B78-BC2857A4030F">

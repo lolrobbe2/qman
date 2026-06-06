@@ -1,0 +1,54 @@
+﻿@using System.Net
+@using global::src.Controller
+@using qmanlib
+
+<div class="controller-view">
+    <CollapsibleContainer Title="Controllers">
+
+        <select title="Select an IP address" @bind:after="LoadControllers" @onchange="OnAddressChanged">
+            @foreach (IPAddress ip in Addresses)
+            {
+                <option value="@ip.ToString()">@ip</option>
+            }
+        </select>
+
+        <ul>
+            @foreach (ControllerInfo controller in Controllers)
+            {
+                
+                <ControllerInfoView ControllerInfo="@controller" />
+                
+            }
+        </ul>
+
+    </CollapsibleContainer>
+</div>
+@code {
+    private List<IPAddress> Addresses = DeviceManager.GetEndpoints();
+    private List<ControllerInfo> Controllers = new();
+
+    private string SelectedAddressString = "0.0.0.0";
+    private IPAddress SelectedAddress = IPAddress.Any;
+    protected override void OnInitialized()
+    {
+        SelectedAddress = Addresses.Where(c => c.GetAddressBytes()[0] == 192).First() ?? IPAddress.Any;
+        SelectedAddressString = SelectedAddress.ToString();
+        LoadControllers();
+    }
+
+    private void OnAddressChanged(ChangeEventArgs args)
+    {
+        SelectedAddressString = args.Value?.ToString() ?? "";
+        SelectedAddress = IPAddress.Parse(SelectedAddressString);
+        LoadControllers();
+    }
+
+    private void LoadControllers()
+    {
+        Controllers = DeviceManager
+            .GetControllers(SelectedAddress);
+
+
+        StateHasChanged();
+    }
+}

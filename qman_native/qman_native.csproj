@@ -73,6 +73,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\qman-common\qman-common.csproj" />
       <ProjectReference Include="..\qman-lib\qman-lib.csproj" />
     </ItemGroup>
 

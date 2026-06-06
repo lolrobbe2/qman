@@ -17,9 +17,9 @@
     }
 
 .qbus-nav {
-    display:flex;
+    display: flex;
     min-height: 1rem;
-    background: black;
+    background: #222428;
     margin: 0rem;
     padding: 0.2rem;
 }

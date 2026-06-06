@@ -1,0 +1,27 @@
+﻿.collapsible-container {
+    border: 0.1rem solid black;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.collapsible-header {
+    color: #b0e5eb;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.2rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: clamp(1rem, 2vw, 1.25rem);
+}
+
+.collapsible-content {
+    margin: 0.1rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}

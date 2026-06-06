@@ -1,0 +1,15 @@
+﻿.ControllerInfoView {
+ margin: 0.1rem;
+}
+.ControllerInfoView .controller-info {
+    list-style: none;
+    border-radius: 0.1rem;
+    background: #ffc92e;
+    margin: 0;
+    padding: 0;
+}
+.ControllerInfoView .controller-info:hover {
+    background: #ffd95a;
+    transform: scale(1.05);
+}
+

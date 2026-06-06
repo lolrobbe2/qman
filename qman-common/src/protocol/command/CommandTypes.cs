@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace qmanlib.protocol.command
+namespace src.protocol.command
 {
     public enum QBUS_COMMAND_TYPE : byte
     {
