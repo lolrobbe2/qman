@@ -1,5 +1,65 @@
 ﻿@page "/"
+@using global::src
+@using qman_native.Components.Model
+@using qman_native.src.utils
+@using src
+<MudGrid Class="mud-width-full mud-height-full" Style="height:90vh;width:100vw">
 
-<h1>Hello, world!</h1>
+    @if (!WorkspaceManager.WorkspaceOpened())
+    {
+        <MudItem xs="12">
+            <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center">
+                <MudAlert Severity="Severity.Info" Variant="Variant.Filled">
+                    No workspace Open
+                </MudAlert>
 
-Welcome to your new app.
+                <MudButton OnClick="OpenWorkspace">
+                    Open Workspace
+                </MudButton>
+            </MudStack>
+        </MudItem>
+    }
+    else if (_loading)
+    {
+        <MudItem xs="12">
+            <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center">
+                <MudText>Loading Workspace ...</MudText>
+                <MudProgressCircular Color="Color.Primary"
+                                     Size="Size.Large"
+                                     Indeterminate="true" />
+            </MudStack>
+        </MudItem>
+    }
+    else
+    {
+        <!-- LEFT PANEL -->
+        <MudItem xs="2">
+            <ModuleTree />
+        </MudItem>
+
+        <!-- RIGHT PANEL -->
+        <MudItem xs="9">
+            <MudPaper Class="pa-4" Style="height:100%;">
+                Select something...
+            </MudPaper>
+        </MudItem>
+    }
+
+</MudGrid>
+
+    @code{
+    private bool _loading { get; set; }
+    private async Task OpenWorkspace()
+    {
+        _loading = true;
+        StateHasChanged();
+        await WorkspaceUtils.OpenWorkspace();
+        if (!WorkspaceManager.WorkspaceOpened())
+        {
+            //TODO oops
+        } 
+        _loading = false;
+        StateHasChanged();
+
+    }
+}

@@ -1,0 +1,153 @@
+﻿@using System.Net
+@using global::src.Controller
+@using qmanlib
+@using src.utils
+<MudDialog Class="mud-width-full mud-height-full">
+    <TitleContent>
+       Select Controller
+    </TitleContent>
+    <DialogContent>
+        <MudSplitPanel @ref="_splitPanel"
+                       Class="mud-width-full mud-height-full"
+                       Horizontal="false"
+                       ResetOnDoubleClick="false"
+                       Rounded="true"
+                       Transparent="false">
+
+            <FirstPanel>
+                <MudStack Class="mud-width-full mud-height-full"
+                    Style="display:flex; align-items:center; justify-content:center;">
+
+                    <MudList T="IPAddress">
+                        @foreach (IPAddress endpoint in endpoints)
+                        {
+                            <MudListItem T="IPAddress"
+                                         OnClick="@(() => Select(endpoint))"
+                                         Class="@(selected == endpoint ? "mud-primary-text" : null)"
+                                         Style="display:flex; align-items:center; justify-content:center;">
+                                <MudIcon Icon="@Icons.Material.Filled.Memory" />
+                                <span>@endpoint</span>
+                            </MudListItem>
+                        }
+                    </MudList>
+                </MudStack>
+            </FirstPanel>
+            <SecondPanel>
+                <MudStack Class="mud-width-full mud-height-full"
+                    Style="display:flex; align-items:center; justify-content:center;">
+
+                @if (loading)
+                {
+                    <MudText>Searching Controllers ...</MudText>
+
+                    <MudProgressCircular Color="Color.Primary" Size="Size.Medium" Indeterminate="true" />
+                }
+                else if (controllers is null || controllers.Count == 0)
+                {
+                    <MudAlert Severity="Severity.Warning">No controllers found!</MudAlert>
+                }
+                else
+                {
+                        <style>
+                            .selected {
+                                background-color: #1E88E5 !important;
+                            }
+
+                            .selected > td {
+                                color: white !important;
+                            }
+
+                            .selected > td .mud-input {
+                                color: white !important;
+                            }
+                        </style>
+                        <MudText>Select a Controller</MudText>
+
+                        <MudTable T="ControllerInfo"
+                                  Items="controllers"
+                                  Hover="true"
+                                  Dense="true"
+                                  Bordered="false"
+                                  MultiSelection="false"
+                                  SelectedItem="selectedController"
+                                  SelectedItemChanged="OnSelectedChanged"
+                                  RowClassFunc="GetRowClass"
+                                  Class="mud-width-full mud-height-full">
+
+                            <HeaderContent>
+                                <MudTh>Name</MudTh>
+                                <MudTh>Address</MudTh>
+                                <MudTh>Serial</MudTh>
+                            </HeaderContent>
+
+                            <RowTemplate>
+                                <MudTd DataLabel="Name">@context.Name</MudTd>
+                                <MudTd DataLabel="Address">@context.Address</MudTd>
+                                <MudTd DataLabel="Serial">@context.Serial</MudTd>
+                            </RowTemplate>
+
+                        </MudTable>
+                    }
+                </MudStack>
+            </SecondPanel>
+        </MudSplitPanel>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Disabled="selectedController is null" Color="Color.Primary" OnClick="Submit">OK</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    #nullable enable
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+    private MudSplitPanel _splitPanel;
+
+    private List<IPAddress> endpoints = new();
+    private List<ControllerInfo> controllers = new();
+    private IPAddress? selected = null;
+    private ControllerInfo? selectedController = null;
+    private bool loading;
+    protected override async Task OnInitializedAsync()
+    {
+        endpoints = DeviceManager.GetEndpoints();
+        await Select(endpoints.First());
+
+    }
+    private string GetRowClass(ControllerInfo item, int rowIndex)
+    {
+        if (item == selectedController)
+            return "selected";
+
+        return string.Empty;
+    }
+    private void OnSelectedChanged(ControllerInfo item)
+    {
+        selectedController = item;
+        StateHasChanged();
+    }
+    private async Task Select(IPAddress ip)
+    {
+        selected = ip;
+        selectedController = null;
+        await LoadControllers();
+    }
+    private async Task LoadControllers()
+    {
+        loading = true;
+        await InvokeAsync(StateHasChanged);
+
+        await Task.Yield(); // lets UI render the spinner
+
+        controllers = await Task.Run(() =>
+            DeviceManager.GetControllers(selected)
+        );
+
+        loading = false;
+        await InvokeAsync(StateHasChanged);
+    }
+    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
+
+    private void Cancel() => MudDialog.Cancel();
+}

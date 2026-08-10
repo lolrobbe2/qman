@@ -1,38 +1,61 @@
-﻿@using qman_native.src
+﻿@inject IDialogService DialogService
 @inject NavigationManager NavigationManager
-<nav class="qbus-nav">
-    @foreach (var item in items)
-    {
-        <a class="nav-item"
-                 href="@item.Path"
-                 Match="NavLinkMatch.All">
-            @item.Title
-        </a>
-    }
-</nav>
+@using Components.Dialogs
+@using FilePickerFileType = Microsoft.Maui.Storage.FilePickerFileType;
+@using MudBlazor.Utilities
+@using qman_native.src.utils
+@using src
+
+<MudAppBar Color="Color.Primary" Fixed="false" Dense="true">
+    <MudHotkey Key="@MudBlazor.Utilities.JsKey.KeyO" KeyModifiers="@([MudBlazor.Utilities.JsKeyModifier.ControlLeft])" Disabled="false" HideChildContentOnRepress="true" OnHotkeyPressed="OpenWorkspace" />
+    <MudHotkey Key="MudBlazor.Utilities.JsKey.KeyS" KeyModifiers="[MudBlazor.Utilities.JsKeyModifier.ControlLeft]" OnHotkeyPressed="@SaveWorkspace" />
+    <MudHotkey Key="MudBlazor.Utilities.JsKey.KeyS" KeyModifiers="[MudBlazor.Utilities.JsKeyModifier.ControlLeft]" OnHotkeyPressed="@OpenWorkspace" />
+    <MudMenu Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Size="Size.Small">
+        <MudMenu StartIcon="@Icons.Material.Filled.DeveloperBoard"
+                 IconColor="Color.Primary"
+                 Size="Size.Small"
+                 Label="Controllers">
+            <MudMenuItem OnClick="OpenControllerSelectDialogAsync" Icon="@Icons.Material.Filled.Search"
+                         IconColor="Color.Secondary"
+                         Label="Select" />
+        </MudMenu>
+        <MudMenu StartIcon="@Icons.Material.Outlined.Folder" Color="Color.Inherit" Size="Size.Small" Label="Workspace">
+            <MudMenuItem OnClick="OpenWorkspace" Icon="@Icons.Material.Filled.FileOpen"
+                             IconColor="Color.Secondary"
+                             Label="Open" />
+            
+
+            <MudMenuItem OnClick="SaveWorkspace" Icon="@Icons.Material.Filled.Save"
+                         IconColor="Color.Secondary"
+                         Label="Save" />
+
+            <MudMenuItem OnClick="SaveAsWorkspace" Icon="@Icons.Material.Filled.SaveAs"
+                         IconColor="Color.Secondary"
+                         Label="Save As" />
+        </MudMenu>
+    </MudMenu>
+    
+    
+
+</MudAppBar>
 @code {
-    private List<NavItem> items = new()
-    {
-        new NavItem { Title = "Home", Path = "/" },
-        new NavItem { Title = "Controllers", Path = "/controllers" },
-        new NavItem { Title = "Profile", Path = "/profile/1" }
-    };
 
-    private string currentPath;
 
-    protected override void OnInitialized()
+    private Task OpenControllerSelectDialogAsync()
     {
-        currentPath = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        return DialogService.ShowAsync<ControllerSelect>("Simple Dialog", options);
+
     }
-
-    private bool IsActive(string path)
+    private async Task OpenWorkspace()
     {
-        return currentPath == path.TrimStart('/');
+        
+       await WorkspaceUtils.OpenWorkspace();
     }
-
-    private void Navigate(string path)
+    private async Task SaveWorkspace()
     {
-        NavigationManager.NavigateTo(path);
-        currentPath = path.TrimStart('/');
+    }
+    private async Task SaveAsWorkspace()
+    {
     }
 }

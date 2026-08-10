@@ -12,6 +12,7 @@ namespace qmanlib.src.storage.models
         [MdbParam("serienr")]
         public string SerialNumber { get; set; }
         [MdbParam("plaats")]
+        // the name of the module
         public string Location { get; set; }
         [MdbParam("reeks")]
         public string Series { get; set; }
@@ -51,5 +52,51 @@ namespace qmanlib.src.storage.models
         public string? EepromCrc { get; set; }
         [MdbParam("FlashCRC")]
         public string? FlashCrc { get; set; }
+    }
+    public enum ModuleType
+    {
+        SWN04,
+        DIM04_500U,
+        REL04SA
+    }
+
+    public static class ModuleTypeExtensions
+    {
+        public static string ToModuleName(this ModuleType moduleType)
+        {
+            switch (moduleType)
+            {
+                case ModuleType.SWN04:
+                    return "SWN04";
+
+                case ModuleType.DIM04_500U:
+                    return "DIM04/500U";
+
+                case ModuleType.REL04SA:
+                    return "REL04SA";
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(moduleType));
+            }
+        }
+        public static ModuleType FromModuleName(string moduleName)
+        {
+            switch (moduleName)
+            {
+                case "SWN04":
+                    return ModuleType.SWN04;
+
+                case "DIM04/500U":
+                    return ModuleType.DIM04_500U;
+
+                case "REL04SA":
+                    return ModuleType.REL04SA;
+
+                default:
+                    throw new ArgumentException(
+                        $"Unknown module name '{moduleName}'.",
+                        nameof(moduleName));
+            }
+        }
     }
 }

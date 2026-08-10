@@ -1,0 +1,27 @@
+﻿@using global::src
+
+<MudTextField T="string"
+              Label="Search"
+              Adornment="Adornment.Start"
+              AdornmentIcon="@Icons.Material.Filled.Search"
+              TextChanged="OnSearch",
+              Immediate="true"
+              Clearable="true" />
+
+<MudTreeView T="object" @ref="_tree">
+
+    <PlaceNode Place="WorkspaceManager.GetRootPlace()" />
+
+</MudTreeView>
+
+@code {
+    private MudTreeView<object>_tree;
+    private string _searchPhrase = "";
+
+    private async Task OnSearch(string text)
+    {
+        _searchPhrase = text;
+
+        await _tree.FilterAsync(); // optional UX boost
+    }
+}   

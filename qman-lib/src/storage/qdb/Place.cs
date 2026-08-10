@@ -16,6 +16,14 @@ namespace qmanlib.src.storage.qdb
     [MdbRow]
     public class QdbPlace : Place
     {
-
+        internal Place ToPlace()
+        {
+            return new()
+            {
+                ID = this.ID,
+                Name = this.Name,
+                ParentID = this.ParentID
+            };
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using MMKiwi.MdbReader;
+using qmanlib.src.storage.models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,8 @@ namespace qmanlib.src.storage.qdb
             Controllers = GetControllers();
             Modules = GetModules();
             Places = GetPlaces();
+            //ALWAYS ADD THE ROOT PLACE NODE
+            Places.Add(new QdbPlace() { ID = 0, Name = "Home", ParentID = -1 });
             Outputs = GetOutputs();
         }
         private IList<QdbController> GetControllers()

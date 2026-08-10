@@ -1,0 +1,36 @@
+﻿@using global::src
+@using qmanlib.src.storage.models
+
+<MudToggleGroup T="ModuleViewType"
+                @bind-Value="SelectedViewType"
+                CheckMark="true"
+                Color="Color.Primary"
+                Outlined="true">
+
+    <MudToggleItem Value="ModuleViewType.Location">
+        Location
+    </MudToggleItem>
+
+</MudToggleGroup>
+
+@if (SelectedViewType == ModuleViewType.Location)
+{
+    <ModulePlaceTree />
+}
+
+@code {
+    public enum ModuleViewType
+    {
+        Location,
+
+    }
+    private ModuleViewType SelectedViewType { get; set; }
+        = ModuleViewType.Location;
+
+    private IList<Module> Modules { get; set; } = new List<Module>();
+
+    protected override void OnInitialized()
+    {
+        Modules = WorkspaceManager.GetModules();
+    }
+}

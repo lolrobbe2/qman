@@ -1,6 +1,16 @@
-﻿@using qman_native.Components.Model
+﻿@using MudBlazor
+@using qman_native.Components.Model
 @inherits LayoutComponentBase
 
-<Navigation />
 
-@Body
+<MudThemeProvider/>
+<MudPopoverProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+<MudLayout>
+    <Navigation />
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>

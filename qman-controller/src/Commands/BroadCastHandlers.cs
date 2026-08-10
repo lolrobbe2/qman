@@ -14,7 +14,6 @@ namespace src.Commands
 
         public static void Initialize()
         {
-           
             XPORTInterface.RegisterFindHandler(XPORT_BROADCAST_COMMANDS.NODE_FIND, NodeFindHandler);
         }
 
@@ -67,7 +66,6 @@ namespace src.Commands
             response.command.reboot = 0;
             response.command.command = XPORT_BROADCAST_COMMANDS.SETUP_RECORD_2_RESPONSE;
             client.SendAsync(response.ToBuffer(), endPoint);
-
         }
         public static void NodeFindHandler(XPORT port, UdpClient client, byte[] received, IPEndPoint endPoint, EndPoint? localEndPoint, XPORT_BROADCAST_COMMANDS command)
         {
@@ -82,6 +80,7 @@ namespace src.Commands
             myIdentity.SubnetMaskBits = 24; // 255.255.255.0
             myIdentity.HardwareID1 = 0x02; // XPort ID
             myIdentity.HardwareID2 = 0x01;
+            myIdentity.SetSerial("000059");
             myIdentity.SetName("LaMa");
             client.SendAsync(myIdentity.ToBuffer(), endPoint);
 

@@ -21,6 +21,7 @@ namespace src.Commands.xport
         // --- Configuration (Setup Record 1 & 2) ---
         // Record 2 is the most common for modern XPort discovery
         SETUP_RECORD_2_QUERRY = 226,  // 0xE2: Search for devices (often used with 0x00 payload)
+        SETUP_RECORD_3_QUERY = 227,
         SETUP_RECORD_2_RESPONSE = 210,  // 0xD2: Returns IP, MAC, Name, and Port config
 
         SETUP_RECORD_1_QUERRY = 225,  // 0xE1: Legacy search
@@ -40,4 +41,6 @@ namespace src.Commands.xport
 
         IP_SETUP = 252
     }
+
+
 }

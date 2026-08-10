@@ -4,6 +4,7 @@ using System.Net;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text;
+using YamlDotNet.Core.Tokens;
 
 namespace src.Commands.xport
 {
@@ -101,7 +102,42 @@ namespace src.Commands.xport
         {
             return ByteConvertable.GetBytes(this);
         }
+        public string GetSerial(){
+            if(_serial == null) {
+                return "000000";
+            }
+            int value =
+                        (_serial[0] << 16) |
+                        (_serial[1] << 8) |
+                         _serial[2];
 
+            return value.ToString("D6");
+        }
 
+        public void SetSerial(string value){
+            if (string.IsNullOrWhiteSpace(value))
+                value = "000000";
+
+            // Remove leading zeros safely
+            string cleaned = value.TrimStart('0');
+
+            // If all zeros → cleaned becomes empty → treat as 0
+            if (cleaned.Length == 0)
+                cleaned = "0";
+
+            // Parse the number (leading zeros ignored)
+            int number = int.Parse(cleaned);
+            _serial = new byte[3];
+            // Store back into 3 bytes (big-endian)
+            _serial[0] = (byte)((number >> 16) & 0xFF);
+            _serial[1] = (byte)((number >> 8) & 0xFF);
+            _serial[2] = (byte)(number & 0xFF);
+        }
+        public string Serial
+        {
+            get => GetSerial();
+
+            set => SetSerial(value);
+        }
     }
 }

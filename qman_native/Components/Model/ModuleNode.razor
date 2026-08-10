@@ -1,0 +1,46 @@
+﻿@using global::src
+@using qman_native.src.utils
+@using qmanlib.src.storage.models
+
+<MudTreeViewItem T="object">
+
+    <Content>
+        <MudIcon Icon="@ModuleIcon" Color="Color.Primary" />
+        @if (_editing)
+        {
+            <MudTextField T="string"
+                          @bind-Value="_name"
+                          AutoFocus="true"
+                          OnBlur="Save" />
+        }
+        else
+        {
+            <MudText @ondblclick="BeginEdit">
+                @Module.Location
+            </MudText>
+        }
+    </Content>
+
+</MudTreeViewItem>
+
+@code {
+    [Parameter] public required Module Module { get; set; }
+
+    private bool _editing;
+    private string _name = "";
+    private string ModuleIcon => ModuleUtils.GetModuleIcon(Module);
+    private void BeginEdit()
+    {
+        _name = Module.Location;
+        _editing = true;
+    }
+
+    private void Save(FocusEventArgs args)
+    {
+        Module.Location = _name;
+
+        WorkspaceManager.UpdateModule(Module);
+
+        _editing = false;
+    }
+}

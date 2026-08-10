@@ -26,6 +26,31 @@ namespace qmanlib.src.storage.qdb
     [MdbRow]
     public class QdbModule : Module
     {
-   
+        public Module ToModule(){
+            return new Module(){
+                Id = this.Id,
+                SerialNumber = this.SerialNumber,
+                Location = this.Location,
+                Series = this.Series,
+                ModuleType = this.ModuleType,
+                CpuType = this.CpuType,
+                FirmwareVersion = this.FirmwareVersion,
+                Input0 = this.Input0,
+                DisplayText = this.DisplayText,
+                AutoVerify = this.AutoVerify,
+                Type = this.Type,
+                LastErrorNumber = this.LastErrorNumber,
+                IsInUse = this.IsInUse,
+                IsModified = this.IsModified,
+                Outputs = this.Outputs,
+                Parameters = this.Parameters,
+                ExtendedOutputs = this.ExtendedOutputs,
+                LocationId = this.LocationId,
+                CtdId = this.CtdId,
+                BusNumber = this.BusNumber,
+                EepromCrc = this.EepromCrc,
+                FlashCrc = this.FlashCrc
+            };
+        }
     }
 }

@@ -1,0 +1,115 @@
+﻿@using global::src
+@using qman_native.src.utils
+@using qmanlib.src.storage.models
+
+@using global::src
+@using qman_native.src.utils
+@using qmanlib.src.storage.models
+
+<MudTreeViewItem T="object"
+                 Expanded="@_expanded">
+
+    <Content>
+        <MudStack Row="true"
+                  AlignItems="AlignItems.Center"
+                  Style="cursor:pointer"
+                  Spacing="1"
+                  @onclick="ToggleExpanded">
+
+            <MudIconButton Icon="@ExpandIcon"
+                           Size="Size.Small"
+                           OnClick="ToggleExpanded" />
+
+            @if (_editing)
+            {
+                <MudTextField T="string"
+                              @bind-Value="_name"
+                              Immediate="true"
+                              AutoFocus="true"
+                              OnBlur="Save" />
+            }
+            else
+            {
+                <MudText @ondblclick="BeginEdit">
+                    @Place.Name
+                </MudText>
+            }
+
+            <MudSpacer />
+
+            <!-- ADD CHILD PLACE BUTTON -->
+            <MudIconButton Icon="@Icons.Material.Filled.AddHome"
+                           Size="Size.Small"
+                           Color="Color.Primary"
+                           OnClick="AddChildPlace"
+                           />
+
+        </MudStack>
+    </Content>
+
+    <ChildContent>
+
+        @foreach (Place child in Children)
+        {
+            <PlaceNode Place="child" />
+        }
+
+        @foreach (Module module in Modules)
+        {
+            <ModuleNode Module="module" />
+        }
+
+    </ChildContent>
+
+</MudTreeViewItem>
+
+@code {
+    [Parameter]
+    public required Place Place { get; set; }
+
+    private bool _editing;
+    private string _name = "";
+    private bool _expanded = true;
+    private string ExpandIcon =>
+    _expanded
+        ? Icons.Custom.Uncategorized.FolderOpen
+        : Icons.Custom.Uncategorized.Folder;
+
+    private IList<Module> Modules =>
+        WorkspaceUtils.GetModules(Place);
+
+    private IList<Place> Children =>
+        WorkspaceManager.GetChildren(Place);
+
+    private void BeginEdit()
+    {
+        _name = Place.Name;
+        _editing = true;
+    }
+
+    private void Save(FocusEventArgs args)
+    {
+        Place.Name = _name;
+
+        WorkspaceManager.UpdatePlace(Place);
+
+        _editing = false;
+    }
+
+    private void ToggleExpanded()
+    {
+        _expanded = !_expanded;
+    }
+    private void AddChildPlace()
+    {
+        Place newPlace = new Place
+        {
+            Name = "New Region",
+            ParentID = Place.ID
+        };
+
+        WorkspaceManager.AddPlace(newPlace);
+
+        _expanded = true; // auto-expand so user sees it immediately
+    }
+}

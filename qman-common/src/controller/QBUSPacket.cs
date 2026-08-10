@@ -22,14 +22,14 @@ namespace src
 
         public bool valid => IsValid();
 
-        public QBUSPacket(byte[] data) {
+        public QBUSPacket(byte[] prefix) {
             _prefix = new byte[11];
 
-            int copyLength = Math.Min(11, data.Length);
-            Array.Copy(data, 0, _prefix, 0, copyLength);
-            _login = data[9];
-            _lengthShifted = data[10];
-            _length = data.Length > 0 ? data[data.Length - 1] : (byte)0;
+            int copyLength = Math.Min(11, prefix.Length);
+            Array.Copy(prefix, 0, _prefix, 0, copyLength);
+            _login = prefix[9];
+            _lengthShifted = prefix[10];
+            _length = prefix.Length > 0 ? prefix[prefix.Length - 1] : (byte)0;
         }
         bool IsValid(){
             return _prefix[0] == 'Q' && _prefix[1] == 'B' && _prefix[2] == 'U' && _prefix[3] == 'S';
@@ -37,6 +37,11 @@ namespace src
         public byte Size(){
             return _length;
         }
+        /// <summary>
+        /// Serializes the packetBody once the packet header has been verified.
+        /// </summary>
+        /// <param name="body"></param>
+        /// <returns> True when the packet header and command are valid</returns>
         public bool SerializeBody(byte[] body){
             if (!IsValid())
                 return false;
@@ -60,6 +65,12 @@ namespace src
             writer.Flush(); 
 
             return memoryStream.ToArray();
+        }
+        public byte[]? GetCommand(){
+            return _command;
+        }
+        public bool IsXPORTCommand(){
+            return _prefix[9] == 250;
         }
     }
 }
