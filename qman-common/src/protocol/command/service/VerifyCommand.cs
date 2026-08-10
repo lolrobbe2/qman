@@ -9,7 +9,8 @@ namespace src.protocol.command.service
     public class VerifyRequestCommand : CommandBase
     {
         public VerifyRequestCommand(byte[] data) {
-
+            _userName = data.Skip(1).Take(16).ToArray();
+            _password = data.Skip(17).Take(16).ToArray();
         }
 
         public VerifyRequestCommand(string userName, string passWord)

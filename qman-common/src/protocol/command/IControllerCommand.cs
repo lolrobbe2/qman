@@ -75,7 +75,7 @@ namespace src.protocol.command
         }
         internal static CommandBase Create(byte[] data, bool controlPort)
         {
-            byte type =data.Skip(9).First();
+            byte type = data.First();
             QBUS_COMMAND_TYPE commandType = (QBUS_COMMAND_TYPE)type;
             bool isReadCommand = false;
             if ((int)type >= 128)

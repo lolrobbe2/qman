@@ -2,6 +2,7 @@
 using Spectre.Console.Cli;
 using src.protocol.command;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -21,8 +22,12 @@ namespace src
         private Action<EndPoint> _onClose { get; set; }
         private Action<IControllerCommand, ControllerConnection> _onControlPort { get; set; }
         private Action<IControllerCommand, ControllerConnection> _onCommandPort { get; set; }
-
+        
         private Dictionary<QBUS_COMMAND_TYPE, Action<Packet<IControllerCommand>>> _handlers { get; set; }
+
+        private ConcurrentQueue<IControllerCommand> _controlPortQueue { get; init; }
+        private ConcurrentQueue<IControllerCommand> _commandQueue { get; init; }
+
         public ControllerConnection(TcpClient tcpClient, Controller controller){
             _tcpClient = tcpClient;
             _controller = controller;
@@ -59,8 +64,10 @@ namespace src
                 if (packet.SerializeBody(packetBody))
                 {   
                     if(packet.PacketData.controlPort) {
-                        _onControlPort.Invoke(packet.Command, this);
-                    } else {
+                        if(_onControlPort is not null)
+                            _onControlPort.Invoke(packet.Command, this);
+                    } else if (_onCommandPort is not null)
+                    {
                         _onCommandPort.Invoke(packet.Command, this);
                     }
                 }
@@ -81,6 +88,9 @@ namespace src
         #endregion
         public void AddControlPortHandler(Action<IControllerCommand, ControllerConnection> handler)
         {
+            if(_onControlPort is null){
+                _onControlPort = handler;
+            }
             _onControlPort += handler;
         }
         
