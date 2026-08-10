@@ -1,5 +1,6 @@
 ﻿using qmanlib.protocol.packet;
 using src.protocol.command.address;
+using src.protocol.command.service;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace src.protocol.command
 {
-    internal interface ICommand : IPacket.IPacketData
+    public interface IControllerCommand : IPacket.IPacketData
     {
         public abstract string Name { get; }
 
@@ -28,8 +29,16 @@ namespace src.protocol.command
         START = 42,//0x2A
         END = 35 //0x23
     };
+    public class CommandSections
+    {
+        public static byte[] prefix => new byte[] { 81, 66, 85, 83, 0, 4, 0, 1, 1 }; //QBUS
+        public static byte START => 42;
+        public static byte END => 35;
+        public static int HEADER_SIZE => prefix.Length + 4;
+        public static int PREFIX_SIZE => prefix.Length;
+    }
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public abstract class CommandBase : ICommand
+    public abstract class CommandBase : IControllerCommand
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string DebuggerDisplay => ToString()!;
@@ -64,16 +73,34 @@ namespace src.protocol.command
         {
             return $"type: {type.ToString()}, {FormatDataString()}";
         }
-        internal static CommandBase Create(byte[] data)
+        internal static CommandBase Create(byte[] data, bool controlPort)
         {
-            QBUS_COMMAND_TYPE type = (QBUS_COMMAND_TYPE)data.Skip(9).First();
+            byte type =data.Skip(9).First();
+            QBUS_COMMAND_TYPE commandType = (QBUS_COMMAND_TYPE)type;
             bool isReadCommand = false;
             if ((int)type >= 128)
             {
                 isReadCommand = true;
-                type = (QBUS_COMMAND_TYPE)((int)type - 128);
+                commandType = (QBUS_COMMAND_TYPE)((int)type - 128);
             }
-            return type switch
+            if(controlPort) {
+                QBUS_CONTROL_COMMAND controlType = (QBUS_CONTROL_COMMAND)type;
+                return controlType switch
+                {
+                    QBUS_CONTROL_COMMAND.VERIFY_PASSWORD => isReadCommand ? throw new NotImplementedException() : new VerifyRequestCommand(data),
+                    QBUS_CONTROL_COMMAND.READ_PASSWORD => throw new NotImplementedException(),
+                    QBUS_CONTROL_COMMAND.STRING_DATA => throw new NotImplementedException(),
+                    QBUS_CONTROL_COMMAND.INITIALISATION_VECTOR => throw new NotImplementedException(),
+                    QBUS_CONTROL_COMMAND.ENCRYPTION_KEY => throw new NotImplementedException(),
+                    QBUS_CONTROL_COMMAND.CLOUD_LOGIN => throw new NotImplementedException(),
+                    QBUS_CONTROL_COMMAND.SHIFT_KEY => throw new NotImplementedException(),
+                    QBUS_CONTROL_COMMAND.POSITION_KEY => throw new NotImplementedException(),
+                    QBUS_CONTROL_COMMAND.WRITE_PASSWORD => throw new NotImplementedException(),
+                    QBUS_CONTROL_COMMAND.ERROR => throw new NotImplementedException(),
+                    _ => throw new NotImplementedException(),
+                };
+            }
+            return commandType switch
             {
                 QBUS_COMMAND_TYPE.SERVICE => throw new NotImplementedException(),
                 QBUS_COMMAND_TYPE.CONTROL_PARAMETERS => throw new NotImplementedException(),

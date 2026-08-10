@@ -7,9 +7,9 @@ using static qmanlib.protocol.packet.IPacket;
 
 namespace qmanlib.protocol.packet
 {
-    internal class IPacket
+    public class IPacket
     {
-        internal interface IPacketData
+        public interface IPacketData
         {
             public byte[] Serialize();
         }

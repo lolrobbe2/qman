@@ -23,7 +23,7 @@ namespace src.protocol.command.address
         public AddressRead()
         {
         }
-
+        #region OVVERIDES
         public override QBUS_COMMAND_TYPE type => QBUS_COMMAND_TYPE.ADDRESS_STATUS;
 
         protected override byte instruction1 => Adress;
@@ -31,7 +31,8 @@ namespace src.protocol.command.address
         protected override byte instruction2 => (byte)SubAdress;
 
         public override string Name => "AddressRead";
-
+        #endregion
+        
         public byte Adress {  get; set; }
         public SUBADDRESS SubAdress { get; set; }
 

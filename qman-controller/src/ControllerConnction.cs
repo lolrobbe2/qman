@@ -1,5 +1,6 @@
-﻿using Spectre.Console.Cli;
-using src.Commands.controller;
+﻿using qmanlib.protocol.packet;
+using Spectre.Console.Cli;
+using src.protocol.command;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,11 +19,10 @@ namespace src
         private Thread _commThread{ get; set; }
         private NetworkStream _stream => _tcpClient.GetStream();
         private Action<EndPoint> _onClose { get; set; }
-        private Action<AbstractCommand, ControllerConnection> _onControlPort { get; set; }
-        private Action<AbstractCommand, ControllerConnection> _onCommandPort { get; set; }
+        private Action<IControllerCommand, ControllerConnection> _onControlPort { get; set; }
+        private Action<IControllerCommand, ControllerConnection> _onCommandPort { get; set; }
 
-        private Dictionary<QBUS_COMMAND_TYPE, Action<AbstractCommand>> _handlers { get; set; }
-        private AbstractCommand _command { get; set; }
+        private Dictionary<QBUS_COMMAND_TYPE, Action<Packet<IControllerCommand>>> _handlers { get; set; }
         public ControllerConnection(TcpClient tcpClient, Controller controller){
             _tcpClient = tcpClient;
             _controller = controller;
@@ -34,7 +34,7 @@ namespace src
         }
         public void CommCommand()
         {
-            QBUSPacket? packet = null;
+            Packet<IControllerCommand>? packet = null;
             while (_tcpClient.Connected)
             {
                 if (_stream.DataAvailable)
@@ -45,7 +45,7 @@ namespace src
             _onClose.Invoke(_tcpClient.Client.RemoteEndPoint!);
         }
         #region PACKET_RECEIVING
-        private void HandlePacket(ref QBUSPacket packet)
+        private void HandlePacket(ref Packet<IControllerCommand> packet)
         {
             if (packet == null)
             {
@@ -57,12 +57,11 @@ namespace src
                 byte[] packetBody = new byte[packet.Size()];
                 int bytesRead = _stream.ReadAtLeast(packetBody.AsSpan<byte>(), packet.Size());
                 if (packet.SerializeBody(packetBody))
-                {
-                    _command = new AbstractCommand(packet.GetCommand());
-                    if(packet.IsXPORTCommand()) {
-                        _onControlPort.Invoke(_command, this);
+                {   
+                    if(packet.PacketData.controlPort) {
+                        _onControlPort.Invoke(packet.Command, this);
                     } else {
-                        _onCommandPort.Invoke(_command, this);
+                        _onCommandPort.Invoke(packet.Command, this);
                     }
                 }
                 //DROP the invalid packet
@@ -70,17 +69,17 @@ namespace src
 
         }
 
-        private QBUSPacket GetHeader()
+        private Packet<IControllerCommand> GetHeader()
         {
-            QBUSPacket packet;
+            Packet<IControllerCommand> packet;
             //read the packet header so we can check if the packet is valid (CommandSections.PREFIX_SIZE + 3)
             byte[] packetHeader = new byte[12];
             int bytesRead = _stream.ReadAtLeast(packetHeader.AsSpan<byte>(), CommandSections.PREFIX_SIZE + 3);
-            packet = new QBUSPacket(packetHeader);
+            packet = new Packet<IControllerCommand>(packetHeader);
             return packet;
         }
         #endregion
-        public void AddControlPortHandler(Action<AbstractCommand, ControllerConnection> handler)
+        public void AddControlPortHandler(Action<IControllerCommand, ControllerConnection> handler)
         {
             _onControlPort += handler;
         }

@@ -7,16 +7,16 @@ using static qmanlib.protocol.packet.IPacket;
 
 namespace qmanlib.protocol.packet
 {
-    internal struct PacketData : IPacketData
+    public struct PacketData : IPacketData
     {
-        byte m_login;
+        byte m_controlPort;
         byte m_length;
         byte m_lengthShifted;
 
-        public bool login
+        public bool controlPort
         {
-            get => m_login == 250;
-            set => m_login = value ? (byte)250 : (byte)255;
+            get => m_controlPort == 250;
+            set => m_controlPort = value ? (byte)250 : (byte)255;
         }
 
         public byte length
@@ -29,12 +29,12 @@ namespace qmanlib.protocol.packet
             }
         }
 
-        public byte[] Serialize() => new byte[] { m_login, m_lengthShifted, m_length };
+        public byte[] Serialize() => new byte[] { m_controlPort, m_lengthShifted, m_length };
 
         public void Deserialize(byte[] data)
         {
             if (data.Length != 3) throw new ArgumentException("[QBUS] packetData needs to be 3 bytes");
-            m_login = data[0];
+            m_controlPort = data[0];
             m_lengthShifted = data[1];
             m_length = data[2];
         }

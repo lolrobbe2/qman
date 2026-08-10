@@ -60,4 +60,16 @@ namespace src.protocol.command
         SD_COPY_DATA = 70, // 0x00000046
         COPY_DATA_SD = 71, // 0x00000047
     };
+    public enum QBUS_CONTROL_COMMAND : byte {
+        VERIFY_PASSWORD = 0,
+        READ_PASSWORD = 1,
+        STRING_DATA = 2,
+        INITIALISATION_VECTOR = 3,
+        ENCRYPTION_KEY = 4,
+        CLOUD_LOGIN = 10,
+        SHIFT_KEY = 16,
+        POSITION_KEY = 17,
+        WRITE_PASSWORD = 129,
+        ERROR = 255
+    }
 }
